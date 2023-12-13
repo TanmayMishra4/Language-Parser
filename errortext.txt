@@ -1,0 +1,10 @@
+START
+  LOOP OVER 
+    COLOUR 
+    SET 
+    LOOP OVER 
+        SET
+		( 
+        FORWARD 
+        RIGHT 
+      END
