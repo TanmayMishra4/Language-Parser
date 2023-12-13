@@ -12,6 +12,8 @@ parse_n: Parse/parse.h Parse/parse.c
 parse_s: Parse/parse.h Parse/parse.c
 	$(CC) Parse/parse.c -o parse_s -I./Parse $(SANITIZE) -lm
 
+interp_n: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.h
+	$(CC) neillsimplescreen.c Interp/interp.c -o interp_n -I./Interp -lm
 interp_s: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Interp/interp.c -o interp_s -I./Interp $(SANITIZE) -lm
 
