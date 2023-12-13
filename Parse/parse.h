@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 #define MAX_LINE_LENGTH 100
-#define MAXNUMTOKENS 100
-#define MAXTOKENSIZE 20
+#define MAXNUMTOKENS 1000
+#define MAXTOKENSIZE 50
 #define strsame(A,B) (strcmp(A, B)==0)
 
 typedef struct prog{

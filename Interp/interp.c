@@ -1,33 +1,49 @@
 #include "parse.h"
-
+// TODO check out of bounds for turtle
 int main(int argc, char** argv){
-    if(argc != 2){
-        fprintf(stderr, "Wrong number of params: Correct usage - ./parse [filename]\n");
+    if(argc > 3 || argc < 2){
+        fprintf(stderr, "Wrong number of params: Correct usage - ./parse [input file] [output file](optional)\n");
         exit(EXIT_FAILURE);
     }
+    Turtle* res = init_turtle();
     char* file_name = argv[1];
     FILE* input_file = fopen(file_name, "r");
     if(input_file == NULL){
         fprintf(stderr, "Cannot open file\n");
         exit(EXIT_FAILURE);
     }
-    bool is_valid = parse_file(input_file);
-    fclose(input_file);
+    bool is_valid = interp_file(input_file, res);
+    // fclose(input_file);
     if(is_valid){
+        if(argc == 3){ // output file case
+            free(res);
+        }
+        else if(argc == 2){ // no output file case
+            free(res);
+        }
         return 0;
     }
     else{
+        free(res);
         return 1;
     }
 }
 
-bool parse_file(FILE* file){
+Turtle* init_turtle(void){
+    Turtle* res = (Turtle*)calloc(1, sizeof(Turtle));
+    res->row = RESHEIGHT/2;
+    res->col = RESWIDTH/2;
+    return res;
+}
+
+bool interp_file(FILE* file, Turtle* res){
     Program* prog = (Program*)calloc(1, sizeof(Program));
     int i = 0;
     while(fscanf(file, "%s", prog->words[i++])==1){
         strip_new_line(prog->words[i]);
     }
-    bool is_valid = check_prog(prog);
+    fclose(file);
+    bool is_valid = check_prog(prog, res);
     free(prog);
     return is_valid;
 }
@@ -41,14 +57,14 @@ void strip_new_line(char* str){
     }
 }
 
-bool check_prog(Program* prog){
+bool check_prog(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(!strsame(prog->words[curword], "START")){
         return false;
     }
     prog->curword++;
-    bool is_inslst = check_inslst(prog);
+    bool is_inslst = check_inslst(prog, res);
     if(is_inslst){
         return true;
     }
@@ -58,7 +74,7 @@ bool check_prog(Program* prog){
     }
 }
 
-bool check_inslst(Program* prog){
+bool check_inslst(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside inslst curword = %i, word = ", curword);
@@ -68,9 +84,9 @@ bool check_inslst(Program* prog){
         return true;
     }
     else{
-        bool is_ins = check_ins(prog);
+        bool is_ins = check_ins(prog, res);
         if(is_ins){
-            bool is_inslst = check_inslst(prog);
+            bool is_inslst = check_inslst(prog, res);
             if(is_inslst){
                 return true;
             }
@@ -86,28 +102,28 @@ bool check_inslst(Program* prog){
     }
 }
 
-bool check_ins(Program* prog){
+bool check_ins(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = prog->curword;
     printf("inside ins curword = %i, word = ", curword);
     puts(prog->words[curword]);
-    if(check_fwd(prog)){
+    if(check_fwd(prog, res)){
         return true;
     }
     prog->curword = original_curword;
-    if(check_rgt(prog)){
+    if(check_rgt(prog, res)){
         return true;
     }
     prog->curword = original_curword;
-    if(check_col(prog)){
+    if(check_col(prog, res)){
         return true;
     }
     prog->curword = original_curword;
-    if(check_loop(prog)){
+    if(check_loop(prog, res)){
         return true;
     }
     prog->curword = original_curword;
-    if(check_set(prog)){
+    if(check_set(prog, res)){
         return true;
     }
     else{
@@ -116,7 +132,7 @@ bool check_ins(Program* prog){
     }
 }
 
-bool check_fwd(Program* prog){
+bool check_fwd(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(strsame(prog->words[curword], "FORWARD")){
@@ -135,7 +151,7 @@ bool check_fwd(Program* prog){
     }
 }
 
-bool check_rgt(Program* prog){
+bool check_rgt(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(strsame(prog->words[curword], "RIGHT")){
@@ -154,7 +170,7 @@ bool check_rgt(Program* prog){
     }
 }
 
-bool check_col(Program* prog){
+bool check_col(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(strsame(prog->words[curword], "COLOUR")){
@@ -176,7 +192,7 @@ bool check_col(Program* prog){
     }
 }
 
-bool check_loop(Program* prog){
+bool check_loop(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(strsame(prog->words[curword], "LOOP")){
@@ -210,7 +226,7 @@ bool check_loop(Program* prog){
     }
 }
 
-bool check_set(Program* prog){
+bool check_set(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside set curword = %i, word = ", curword);
@@ -238,7 +254,7 @@ bool check_set(Program* prog){
     }
 }
 
-bool check_varnum(Program* prog){
+bool check_varnum(Program* prog, Turtle* res){
     int original_curword = prog->curword;
     bool is_var = check_var(prog);
     if(is_var){
@@ -253,7 +269,7 @@ bool check_varnum(Program* prog){
     return false;
 }
 // TODO: Complete fully, only partially working now
-bool check_word(Program* prog){
+bool check_word(Program* prog, Turtle* res){
     int curword = prog->curword;
     printf("inside word, word = ");
     puts(prog->words[curword]);
@@ -296,7 +312,7 @@ bool check_word(Program* prog){
     return true;
 }
 
-bool check_var(Program* prog){
+bool check_var(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(prog->words[curword][0] == '$'){
@@ -313,7 +329,7 @@ bool check_var(Program* prog){
     return false;
 }
 
-bool check_pfix(Program* prog){
+bool check_pfix(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     if(strsame(prog->words[curword], ")")){
@@ -345,7 +361,7 @@ bool check_pfix(Program* prog){
     }
 }
 // TODO : see for $A and A 
-bool check_ltr(Program* prog, int index){
+bool check_ltr(Program* prog, int index, Trutle* res){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
     printf("inside ltr curword = %i, word = ", curword);
@@ -363,7 +379,7 @@ bool check_ltr(Program* prog, int index){
 
 }
 
-bool check_lst(Program* prog){
+bool check_lst(Program* prog, Trutle* res){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside lst curword = %i, word = ", curword);
@@ -384,7 +400,7 @@ bool check_lst(Program* prog){
     }
 }
 
-bool check_num(Program* prog){
+bool check_num(Program* prog, Trutle* res){
     int curword = prog->curword;
     double num;
     int num_vars = sscanf(prog->words[curword], "%lf", &num);
@@ -395,7 +411,7 @@ bool check_num(Program* prog){
     return  true;
 }
 
-bool check_op(Program* prog){
+bool check_op(Program* prog, Turtle* res){
     int curword = prog->curword;
     if(strsame(prog->words[curword], "+")){
         prog->curword++;
@@ -418,7 +434,7 @@ bool check_op(Program* prog){
     }
 }
 
-bool check_items(Program* prog){
+bool check_items(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside items curword = %i, word = ", curword);
@@ -444,7 +460,7 @@ bool check_items(Program* prog){
     }
 }
 
-bool check_item(Program* prog){
+bool check_item(Program* prog, Turtle* res){
     int original_curword = prog->curword;
     printf("inside item, word = ");
     puts(prog->words[original_curword]);
