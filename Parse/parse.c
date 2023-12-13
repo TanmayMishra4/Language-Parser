@@ -162,7 +162,9 @@ bool check_col(Program* prog){
         if(check_var(prog)){
             return true;
         }
-        prog->curword = original_curword;
+        prog->curword = original_curword + 1;
+        printf("inside col, word = ");
+        puts(prog->words[prog->curword]);
         if(check_word(prog)){
             return true;
         }
@@ -253,40 +255,45 @@ bool check_varnum(Program* prog){
 // TODO: Complete fully, only partially working now
 bool check_word(Program* prog){
     int curword = prog->curword;
-    int original_curword = curword;
+    printf("inside word, word = ");
+    puts(prog->words[curword]);
+    // int original_curword = curword;
     int len = strlen(prog->words[curword]);
     if(prog->words[curword][0] != '"' && prog->words[curword][len-1] != '"'){
         return false;
     }
-    char word[MAXTOKENSIZE] = {0};
-    copy_word_from_str(word, prog->words[curword]);
-    printf("inside word, word = ");
-    puts(word);
-    if(strsame(word, "RED")){
-        printf("matched\n");
-        prog->curword++;
-        return true;
+    for(int i=1;i<len-1;i++){
+        if(prog->words[curword][i] == '"' || prog->words[curword][i] == ' ' || prog->words[curword][i] == '\n' || prog->words[curword][i] == '\t' || prog->words[curword][i] == '\f' || prog->words[curword][i] == '\v'){
+            return false;
+        }
     }
-    else if(strsame(word, "GREEN")){
-        prog->curword++;
-        return true;
-    }
-    else if(strsame(word, "YELLOW")){
-        prog->curword++;
-        return true;
-    }
-    else if(strsame(word, "CYAN")){
-        prog->curword++;
-        return true;
-    }
-    else if(strsame(word, "MAGENTA")){
-        prog->curword++;
-        return true;
-    }
-    printf("should not be here\n");
-    prog->curword = original_curword;
-    return false;
-    
+    // copy_word_from_str(word, prog->words[curword]);
+    // if(strsame(word, "RED")){
+    //     printf("matched\n");
+    //     prog->curword++;
+    //     return true;
+    // }
+    // else if(strsame(word, "GREEN")){
+    //     prog->curword++;
+    //     return true;
+    // }
+    // else if(strsame(word, "YELLOW")){
+    //     prog->curword++;
+    //     return true;
+    // }
+    // else if(strsame(word, "CYAN")){
+    //     prog->curword++;
+    //     return true;
+    // }
+    // else if(strsame(word, "MAGENTA")){
+    //     prog->curword++;
+    //     return true;
+    // }
+    // printf("should not be here\n");
+    // prog->curword = original_curword;
+    // return false;
+    prog->curword++;
+    return true;
 }
 
 bool check_var(Program* prog){
