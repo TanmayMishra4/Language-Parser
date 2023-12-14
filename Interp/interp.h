@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include "../neillsimplescreen.h"
 
 #define PI 3.14159
 #define MAX_LINE_LENGTH 100
@@ -22,16 +23,16 @@ typedef enum FILETYPE{
     POSTSCRIPT_FILE
 } FILETYPE;
 
-typedef enum COLOUR{
-    WHITE,
-    BLACK,
-    RED,
-    GREEN,
-    YELLOW,
-    BLUE,
-    MAGENTA,
-    CYAN
-} COLOUR;
+// typedef enum COLOUR{
+//     WHITE,
+//     BLACK,
+//     RED,
+//     GREEN,
+//     YELLOW,
+//     BLUE,
+//     MAGENTA,
+//     CYAN
+// } COLOUR;
 
 typedef enum VARTYPE{
     STRING,
@@ -41,7 +42,7 @@ typedef enum VARTYPE{
 typedef struct VAR{
     VARTYPE vartype;
     char* strval[MAXTOKENSIZE];
-    int numval;
+    double numval;
 } VAR;
 
 typedef struct prog{
@@ -57,7 +58,7 @@ typedef struct Turtle{
     FILE* file;
     double angle;
     FILETYPE filetype;
-    COLOUR colour;
+    neillcol colour;
 } Turtle;
 
 bool interp_file(FILE* file, Turtle* res);
@@ -74,7 +75,7 @@ bool check_set(Program* prog, Turtle* res);
 bool check_varnum(Program* prog, Turtle* res, VAR* num);
 bool check_word(Program* prog, Turtle* res);
 bool check_var(Program* prog, Turtle* res, VAR* num);
-bool check_pfix(Program* prog, Turtle* res);
+bool check_pfix(Program* prog, Turtle* res, VAR* val);
 bool check_ltr(Program* prog, int index, Turtle* res);
 bool check_lst(Program* prog, Turtle* res);
 bool check_num(Program* prog, Turtle* res, VAR* num);
@@ -85,7 +86,9 @@ void get_file_extension(char* file_name, char* extension);
 void print_to_file(Program* prog, Turtle* res, int num);
 int fetch_num(Program* prog, int step_pos, Turtle* res);
 void process_rgt(Turtle* res, int angle);
-char convert_colour_to_char(COLOUR colour);
+char convert_colour_to_char(neillcol colour);
 void write_to_file(Turtle* res, char* file_name);
-COLOUR fetch_colour(Program* prog, int curword);
-void process_colour(Turtle* res, COLOUR colour);
+neillcol fetch_colour(Program* prog, int curword);
+void process_colour(Turtle* res, neillcol colour);
+char str_to_var(char* str);
+void set_var(Program* prog, char var_name, VAR* val);

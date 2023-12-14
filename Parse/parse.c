@@ -61,8 +61,6 @@ bool check_prog(Program* prog){
 bool check_inslst(Program* prog){
     int curword = prog->curword;
     int original_curword = curword;
-    printf("inside inslst curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(strsame(prog->words[curword], "END")){
         prog->curword++;
         return true;
@@ -87,10 +85,7 @@ bool check_inslst(Program* prog){
 }
 
 bool check_ins(Program* prog){
-    int curword = prog->curword;
     int original_curword = prog->curword;
-    printf("inside ins curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(check_fwd(prog)){
         return true;
     }
@@ -163,8 +158,6 @@ bool check_col(Program* prog){
             return true;
         }
         prog->curword = original_curword + 1;
-        printf("inside col, word = ");
-        puts(prog->words[prog->curword]);
         if(check_word(prog)){
             return true;
         }
@@ -187,8 +180,6 @@ bool check_loop(Program* prog){
         }
         // prog->curword++;
         curword =  prog->curword;
-        printf("after letter word = ");
-        puts(prog->words[prog->curword]);
         if(!strsame(prog->words[curword], "OVER")){
             prog->curword = original_curword;
             return false;
@@ -213,8 +204,6 @@ bool check_loop(Program* prog){
 bool check_set(Program* prog){
     int curword = prog->curword;
     int original_curword = curword;
-    printf("inside set curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(strsame(prog->words[curword], "SET")){
         prog->curword++;
         if(!check_ltr(prog, 0)){
@@ -255,9 +244,6 @@ bool check_varnum(Program* prog){
 // TODO: Complete fully, only partially working now
 bool check_word(Program* prog){
     int curword = prog->curword;
-    printf("inside word, word = ");
-    puts(prog->words[curword]);
-    // int original_curword = curword;
     int len = strlen(prog->words[curword]);
     if(prog->words[curword][0] != '"' && prog->words[curword][len-1] != '"'){
         return false;
@@ -267,31 +253,6 @@ bool check_word(Program* prog){
             return false;
         }
     }
-    // copy_word_from_str(word, prog->words[curword]);
-    // if(strsame(word, "RED")){
-    //     printf("matched\n");
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "GREEN")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "YELLOW")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "CYAN")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "MAGENTA")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // printf("should not be here\n");
-    // prog->curword = original_curword;
-    // return false;
     prog->curword++;
     return true;
 }
@@ -348,15 +309,12 @@ bool check_pfix(Program* prog){
 bool check_ltr(Program* prog, int index){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
-    printf("inside ltr curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(len < 1 || len > 2){
         return false;
     }
     char letter = prog->words[curword][index];
     if(letter >=  'A' && letter <= 'Z'){
         prog->curword++;
-        printf("here\n");
         return true;
     }
     return false;
@@ -366,8 +324,6 @@ bool check_ltr(Program* prog, int index){
 bool check_lst(Program* prog){
     int curword = prog->curword;
     int original_curword = curword;
-    printf("inside lst curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(strsame(prog->words[curword], "{")){
         prog->curword++;
         bool is_valid = check_items(prog);
@@ -421,8 +377,6 @@ bool check_op(Program* prog){
 bool check_items(Program* prog){
     int curword = prog->curword;
     int original_curword = curword;
-    printf("inside items curword = %i, word = ", curword);
-    puts(prog->words[curword]);
     if(strsame(prog->words[curword], "}")){
         prog->curword++;
         return true;
@@ -446,15 +400,11 @@ bool check_items(Program* prog){
 
 bool check_item(Program* prog){
     int original_curword = prog->curword;
-    printf("inside item, word = ");
-    puts(prog->words[original_curword]);
     bool is_varnum = check_varnum(prog);
     if(is_varnum){
         return true;
     }
     prog->curword = original_curword;
-    printf("inside item, word = ");
-    puts(prog->words[prog->curword]);
     bool is_word = check_word(prog);
     if(is_word){
         return true;

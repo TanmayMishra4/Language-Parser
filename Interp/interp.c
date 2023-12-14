@@ -48,7 +48,7 @@ int main(int argc, char** argv){
 Turtle* init_turtle(char* file_name){
     Turtle* res = (Turtle*)calloc(1, sizeof(Turtle));
     res->angle = INITIAL_ANGLE;
-    res->colour = WHITE;
+    res->colour = white;
     if(file_name != NULL){
         char extension[10] = {0};
         get_file_extension(file_name, extension);
@@ -229,7 +229,7 @@ bool check_col(Program* prog, Turtle* res){
         printf("inside col, word = ");
         puts(prog->words[prog->curword]);
         if(check_word(prog, res)){
-            COLOUR colour = fetch_colour(prog, original_curword+1);
+            neillcol colour = fetch_colour(prog, original_curword+1);
             process_colour(res, colour);
             return true;
         }
@@ -286,16 +286,20 @@ bool check_set(Program* prog, Turtle* res){
             prog->curword = original_curword;
             return false;
         }
+        printf("variable name = %s\n", prog->words[prog->curword-1]);
+        char var_name = str_to_var(prog->words[prog->curword-1]);
         curword = prog->curword;
         if(!strsame(prog->words[curword], "(")){
             prog->curword = original_curword;
             return false;
         }
         prog->curword++;
-        if(!check_pfix(prog, res)){
+        VAR val;
+        if(!check_pfix(prog, res, &val)){
             prog->curword = original_curword;
             return false;
         }
+        set_var(prog, var_name, &val);
         return true;
     }
     else{
@@ -368,6 +372,10 @@ bool check_var(Program* prog, Turtle* res, VAR* var){
     if(prog->words[curword][0] == '$'){
         bool is_ltr = check_ltr(prog, 1, res);
         if(is_ltr){
+            char var_name = str_to_var(prog->words[curword]);
+            int pos = var_name - 'A';
+            var->vartype = prog->variables[pos].vartype;
+            var->numval = prog->variables[pos].numval;
             return true;
         }
         else{
@@ -379,16 +387,15 @@ bool check_var(Program* prog, Turtle* res, VAR* var){
     return false;
 }
 
-bool check_pfix(Program* prog, Turtle* res){
+bool check_pfix(Program* prog, Turtle* res, VAR* var){
     int curword = prog->curword;
     int original_curword = curword;
-    VAR var;
     if(strsame(prog->words[curword], ")")){
         prog->curword++;
         return true;
     }
     else if(check_op(prog, res)){
-        bool is_valid = check_pfix(prog, res);
+        bool is_valid = check_pfix(prog, res, var);
         if(is_valid){
             return true;
         }
@@ -397,8 +404,8 @@ bool check_pfix(Program* prog, Turtle* res){
             return false;
         }
     }
-    else if(check_varnum(prog, res, &var)){
-        bool is_valid = check_pfix(prog, res);
+    else if(check_varnum(prog, res, var)){
+        bool is_valid = check_pfix(prog, res, var);
         if(is_valid){
             return true;
         }
@@ -581,27 +588,27 @@ void print_to_file(Program* prog, Turtle* res, int num){
     }
 }
 
-char convert_colour_to_char(COLOUR colour){
+char convert_colour_to_char(neillcol colour){
     char val;
-    if(colour == WHITE){
+    if(colour == white){
         val = 'W';
     }
-    else if(colour == BLACK){
+    else if(colour == black){
         val = 'K';
     }
-    else if(colour == RED){
+    else if(colour == red){
         val = 'R';
     }
-    else if(colour == GREEN){
+    else if(colour == green){
         val = 'G';
     }
-    else if(colour == YELLOW){
+    else if(colour == yellow){
         val = 'Y';
     }
-    else if(colour == BLUE){
+    else if(colour == blue){
         val = 'B';
     }
-    else if(colour == MAGENTA){
+    else if(colour == magenta){
         val = 'M';
     }
     else{
@@ -633,38 +640,60 @@ void process_rgt(Turtle* res, int angle){
     printf("angle = %.2lf\n", res->angle);
 }
 
-COLOUR fetch_colour(Program* prog, int curword){
+neillcol fetch_colour(Program* prog, int curword){
     char* colour = prog->words[curword];
-    COLOUR val;
+    neillcol val;
     if(strsame(colour, "\"WHITE\"")){
-        val = WHITE;
+        val = white;
     }
     else if(strsame(colour, "\"BLACK\"")){
-        val = BLACK;
+        val = black;
     }
     else if(strsame(colour, "\"RED\"")){
-        val = RED;
+        val = red;
     }
     else if(strsame(colour, "\"GREEN\"")){
-        val = GREEN;
+        val = green;
     }
     else if(strsame(colour, "\"YELLOW\"")){
-        val = YELLOW;
+        val = yellow;
     }
     else if(strsame(colour, "\"BLUE\"")){
-        val = BLUE;
+        val = blue;
     }
     else if(strsame(colour, "\"CYAN\"")){
-        val = CYAN;
+        val = cyan;
     }
     else{
-        val = MAGENTA;
+        val = magenta;
     }
     return val;
 }
 
-void process_colour(Turtle* res, COLOUR colour){
+void process_colour(Turtle* res, neillcol colour){
     res->colour = colour;
+}
+
+char str_to_var(char* str){
+    int len = strlen(str);
+    if(len == 1){
+        return str[0];
+    }
+    else if(len == 2){
+        return str[1];
+    }
+    else{
+        printf("invalid string passed to str_to_val\n");
+        return 'A';
+    }
+}
+
+void set_var(Program* prog, char var_name, VAR* val){
+    int pos = var_name - 'A';
+    prog->variables[pos].numval = val->numval;
+    prog->variables[pos].vartype = val->vartype;
+    prog->is_var_used[pos] = true;
+    printf("var %c set to %lf\n", var_name, prog->variables[pos].numval);
 }
 
 
