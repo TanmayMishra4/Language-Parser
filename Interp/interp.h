@@ -10,10 +10,10 @@
 #define MAXTOKENSIZE 50
 #define RESWIDTH 51
 #define RESHEIGHT 33
-#define TERMINALHEIGHT 80
-#define TERMINALWIDTH 100
+#define TERMINALHEIGHT 33
+#define TERMINALWIDTH 51
 #define strsame(A,B) (strcmp(A, B)==0)
-#define NUM_VARS 26
+#define NUM_VARS 27
 #define INITIAL_ANGLE 180
 
 typedef enum FILETYPE{
@@ -33,10 +33,21 @@ typedef enum COLOUR{
     CYAN
 } COLOUR;
 
+typedef enum VARTYPE{
+    STRING,
+    INTEGER
+} VARTYPE;
+
+typedef struct VARS{
+    VARTYPE vartype;
+    char* strval[MAXTOKENSIZE];
+    int intval;
+} VARS;
+
 typedef struct prog{
    char words[MAXNUMTOKENS][MAXTOKENSIZE];
    int curword; // Current Word
-   int variable[NUM_VARS];
+   VARS variables[NUM_VARS];
    bool is_var_used[NUM_VARS];
 } Program;
 

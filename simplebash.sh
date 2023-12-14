@@ -1,11 +1,11 @@
 #!/bin/bash
-rm parse_n
-make parse_n
+rm parse_s
+make parse_s
 touch testoutput.txt
 directory=`ls TTLs/`
 for i in $directory
 do
-    timeout 20 ./parse_n TTLs/$i > testoutput.txt
+    timeout 20 ./parse_s TTLs/$i > testoutput.txt
     r=$?
     if [ "$i" = "fail_parse_ok_interp.ttl" ]; then
         case $r in

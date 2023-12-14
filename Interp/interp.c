@@ -328,6 +328,7 @@ bool check_word(Program* prog, Turtle* res){
             return false;
         }
     }
+
     // copy_word_from_str(word, prog->words[curword]);
     // if(strsame(word, "RED")){
     //     printf("matched\n");
@@ -551,23 +552,49 @@ void print_to_file(Program* prog, Turtle* res, int num){
 
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
-        double target_y = res->row + num*cos(angle);
-        double target_x = res->col + num*sin(angle);
         char colour = convert_colour_to_char(res->colour);
-        for(int i=0;i<num;i++){
-            int x, y;
-            printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
-            y = (int)(res->row);
-            x = (int)(res->col);
-            res->row = res->row + cos(angle);
-            res->col = res->col + sin(angle);
-            // res->row = y;
-            // res->col = x;
-            printf("coordinates = %i, %i\n", y, x);
-            res->matrix[y][x] = colour;
-        }
-        // res->row = res->row - cos(angle);
-        // res->col = res->col - sin(angle);
+        // for(int i=0;i<num;i++){
+        //     int x, y;
+        //     printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
+        //     y = (int)(res->row);
+        //     x = (int)(res->col);
+        //     res->row = res->row + cos(angle);
+        //     res->col = res->col + sin(angle);
+        //     // res->row = y;
+        //     // res->col = x;
+        //     printf("coordinates = %i, %i\n", y, x);
+        //     res->matrix[y][x] = colour;
+        // }
+        // // res->row = res->row - cos(angle);
+        // // res->col = res->col - sin(angle);
+        double dx, dy, p, x, y;
+        double x0 = res->col;
+        double y0 = res->row;
+        double x1 = res->row + num*sin(angle);
+        double y1 = res->col + num*cos(angle);
+        dx=x1-x0;  
+        dy=y1-y0;  
+        x=x0;  
+        y=y0;  
+        p=2*dy-dx;
+        int r, c;
+        r = round(y);
+        c = round(x);
+        while(x<x1)  
+        {  
+            if(p>=0)  
+            {
+                res->matrix[r][c] = colour; 
+                y=y+1;  
+                p=p+2*dy-2*dx;  
+            }  
+            else  
+            {  
+                res->matrix[r][c] = colour;
+                p=p+2*dy;
+            }  
+            x=x+1;  
+        }  
     }
     else{ // Post Script FILE case
 
