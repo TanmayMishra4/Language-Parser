@@ -35,19 +35,19 @@ typedef enum COLOUR{
 
 typedef enum VARTYPE{
     STRING,
-    INTEGER
+    DOUBLE
 } VARTYPE;
 
-typedef struct VARS{
+typedef struct VAR{
     VARTYPE vartype;
     char* strval[MAXTOKENSIZE];
-    int intval;
-} VARS;
+    int numval;
+} VAR;
 
 typedef struct prog{
    char words[MAXNUMTOKENS][MAXTOKENSIZE];
    int curword; // Current Word
-   VARS variables[NUM_VARS];
+   VAR variables[NUM_VARS];
    bool is_var_used[NUM_VARS];
 } Program;
 
@@ -71,13 +71,13 @@ bool check_rgt(Program* prog, Turtle* res);
 bool check_col(Program* prog, Turtle* res);
 bool check_loop(Program* prog, Turtle* res);
 bool check_set(Program* prog, Turtle* res);
-bool check_varnum(Program* prog, Turtle* res);
+bool check_varnum(Program* prog, Turtle* res, VAR* num);
 bool check_word(Program* prog, Turtle* res);
-bool check_var(Program* prog, Turtle* res);
+bool check_var(Program* prog, Turtle* res, VAR* num);
 bool check_pfix(Program* prog, Turtle* res);
 bool check_ltr(Program* prog, int index, Turtle* res);
 bool check_lst(Program* prog, Turtle* res);
-bool check_num(Program* prog, Turtle* res);
+bool check_num(Program* prog, Turtle* res, VAR* num);
 bool check_op(Program* prog, Turtle* res);
 bool check_items(Program* prog, Turtle* res);
 bool check_item(Program* prog, Turtle* res);

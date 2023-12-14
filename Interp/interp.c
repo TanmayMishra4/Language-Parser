@@ -174,10 +174,11 @@ bool check_fwd(Program* prog, Turtle* res){
     if(strsame(prog->words[curword], "FORWARD")){
         prog->curword++;
         int step_pos = prog->curword;
-        bool is_valid = check_varnum(prog, res);
+        VAR var;
+        bool is_valid = check_varnum(prog, res, &var);
         if(is_valid){
-            // double steps = extract_num(prog)
-            int num = fetch_num(prog, step_pos, res);
+            // int num = fetch_num(prog, step_pos, res);
+            int num = (int)var.numval;
             print_to_file(prog, res, num);
             return true;
         }
@@ -197,9 +198,11 @@ bool check_rgt(Program* prog, Turtle* res){
     if(strsame(prog->words[curword], "RIGHT")){
         prog->curword++;
         int step_pos = prog->curword;
-        bool is_valid = check_varnum(prog, res);
+        VAR var;
+        bool is_valid = check_varnum(prog, res, &var);
         if(is_valid){
-            int num = fetch_num(prog, step_pos, res);
+            // int num = fetch_num(prog, step_pos, res);
+            int num = (int)var.numval;
             process_rgt(res, num);
             return true;
         }
@@ -218,7 +221,8 @@ bool check_col(Program* prog, Turtle* res){
     int original_curword = curword;
     if(strsame(prog->words[curword], "COLOUR")){
         prog->curword++;
-        if(check_var(prog, res)){
+        VAR var;
+        if(check_var(prog, res, &var)){
             return true;
         }
         prog->curword = original_curword + 1;
@@ -299,14 +303,14 @@ bool check_set(Program* prog, Turtle* res){
     }
 }
 
-bool check_varnum(Program* prog, Turtle* res){
+bool check_varnum(Program* prog, Turtle* res, VAR* num){
     int original_curword = prog->curword;
-    bool is_var = check_var(prog, res);
+    bool is_var = check_var(prog, res, num);
     if(is_var){
         return true;
     }
     prog->curword = original_curword;
-    bool is_num = check_num(prog, res);
+    bool is_num = check_num(prog, res, num);
     if(is_num){
         return true;
     }
@@ -358,7 +362,7 @@ bool check_word(Program* prog, Turtle* res){
     return true;
 }
 
-bool check_var(Program* prog, Turtle* res){
+bool check_var(Program* prog, Turtle* res, VAR* var){
     int curword = prog->curword;
     int original_curword = curword;
     if(prog->words[curword][0] == '$'){
@@ -378,6 +382,7 @@ bool check_var(Program* prog, Turtle* res){
 bool check_pfix(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
+    VAR var;
     if(strsame(prog->words[curword], ")")){
         prog->curword++;
         return true;
@@ -392,7 +397,7 @@ bool check_pfix(Program* prog, Turtle* res){
             return false;
         }
     }
-    else if(check_varnum(prog, res)){
+    else if(check_varnum(prog, res, &var)){
         bool is_valid = check_pfix(prog, res);
         if(is_valid){
             return true;
@@ -446,13 +451,15 @@ bool check_lst(Program* prog, Turtle* res){
     }
 }
 
-bool check_num(Program* prog, Turtle* res){
+bool check_num(Program* prog, Turtle* res, VAR* var){
     int curword = prog->curword;
     double num;
     int num_vars = sscanf(prog->words[curword], "%lf", &num);
     if(num_vars != 1){
         return false;
     }
+    var->vartype = DOUBLE;
+    var->numval = num;
     prog->curword++;
     return  true;
 }
@@ -510,7 +517,8 @@ bool check_item(Program* prog, Turtle* res){
     int original_curword = prog->curword;
     printf("inside item, word = ");
     puts(prog->words[original_curword]);
-    bool is_varnum = check_varnum(prog, res);
+    VAR var;
+    bool is_varnum = check_varnum(prog, res, &var);
     if(is_varnum){
         return true;
     }
@@ -553,48 +561,20 @@ void print_to_file(Program* prog, Turtle* res, int num){
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
         char colour = convert_colour_to_char(res->colour);
-        // for(int i=0;i<num;i++){
-        //     int x, y;
-        //     printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
-        //     y = (int)(res->row);
-        //     x = (int)(res->col);
-        //     res->row = res->row + cos(angle);
-        //     res->col = res->col + sin(angle);
-        //     // res->row = y;
-        //     // res->col = x;
-        //     printf("coordinates = %i, %i\n", y, x);
-        //     res->matrix[y][x] = colour;
-        // }
+        for(int i=0;i<num;i++){
+            int x, y;
+            printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
+            y = (int)(res->row);
+            x = (int)(res->col);
+            res->row = res->row + cos(angle);
+            res->col = res->col + sin(angle);
+            // res->row = y;
+            // res->col = x;
+            printf("coordinates = %i, %i\n", y, x);
+            res->matrix[y][x] = colour;
+        }
         // // res->row = res->row - cos(angle);
-        // // res->col = res->col - sin(angle);
-        double dx, dy, p, x, y;
-        double x0 = res->col;
-        double y0 = res->row;
-        double x1 = res->row + num*sin(angle);
-        double y1 = res->col + num*cos(angle);
-        dx=x1-x0;  
-        dy=y1-y0;  
-        x=x0;  
-        y=y0;  
-        p=2*dy-dx;
-        int r, c;
-        r = round(y);
-        c = round(x);
-        while(x<x1)  
-        {  
-            if(p>=0)  
-            {
-                res->matrix[r][c] = colour; 
-                y=y+1;  
-                p=p+2*dy-2*dx;  
-            }  
-            else  
-            {  
-                res->matrix[r][c] = colour;
-                p=p+2*dy;
-            }  
-            x=x+1;  
-        }  
+        // // res->col = res->col - sin(angle); 
     }
     else{ // Post Script FILE case
 
