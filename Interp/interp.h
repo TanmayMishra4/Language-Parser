@@ -76,3 +76,5 @@ int fetch_num(Program* prog, int step_pos, Turtle* res);
 void process_rgt(Turtle* res, int angle);
 char convert_colour_to_char(COLOUR colour);
 void write_to_file(Turtle* res, char* file_name);
+COLOUR fetch_colour(Program* prog, int curword);
+void process_colour(Turtle* res, COLOUR colour);

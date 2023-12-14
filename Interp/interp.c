@@ -212,7 +212,7 @@ bool check_rgt(Program* prog, Turtle* res){
         return false;
     }
 }
-
+// TODO handlew variable colour value and NOTCOLOUR
 bool check_col(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
@@ -225,6 +225,8 @@ bool check_col(Program* prog, Turtle* res){
         printf("inside col, word = ");
         puts(prog->words[prog->curword]);
         if(check_word(prog, res)){
+            COLOUR colour = fetch_colour(prog, original_curword+1);
+            process_colour(res, colour);
             return true;
         }
         prog->curword = original_curword;
@@ -403,7 +405,7 @@ bool check_pfix(Program* prog, Turtle* res){
         return false;
     }
 }
-// TODO : see for $A and A 
+
 bool check_ltr(Program* prog, int index, Turtle* res){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
@@ -544,24 +546,28 @@ int fetch_num(Program* prog, int step_pos, Turtle* res){
 }
 // TODO check for out of bounds
 void print_to_file(Program* prog, Turtle* res, int num){
-    int angle = ((double)res->angle*PI)/180;
+    double angle = ((double)res->angle*PI)/180;
     if(res->filetype == NO_FILE){ // terminal case
 
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
+        double target_y = res->row + num*cos(angle);
+        double target_x = res->col + num*sin(angle);
+        char colour = convert_colour_to_char(res->colour);
         for(int i=0;i<num;i++){
             int x, y;
-            res->row = res->row + cos(angle);
-            res->col = res->col + sin(angle);
-            printf("cos(angle) = %.2lf, sine(angle) = %.2lf\n", cos(angle), sin(angle));
+            printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
             y = (int)(res->row);
             x = (int)(res->col);
+            res->row = res->row + cos(angle);
+            res->col = res->col + sin(angle);
             // res->row = y;
             // res->col = x;
             printf("coordinates = %i, %i\n", y, x);
-            char colour = convert_colour_to_char(res->colour);
             res->matrix[y][x] = colour;
         }
+        // res->row = res->row - cos(angle);
+        // res->col = res->col - sin(angle);
     }
     else{ // Post Script FILE case
 
@@ -619,4 +625,39 @@ void process_rgt(Turtle* res, int angle){
     res->angle = res->angle - angle;
     printf("angle = %.2lf\n", res->angle);
 }
+
+COLOUR fetch_colour(Program* prog, int curword){
+    char* colour = prog->words[curword];
+    COLOUR val;
+    if(strsame(colour, "\"WHITE\"")){
+        val = WHITE;
+    }
+    else if(strsame(colour, "\"BLACK\"")){
+        val = BLACK;
+    }
+    else if(strsame(colour, "\"RED\"")){
+        val = RED;
+    }
+    else if(strsame(colour, "\"GREEN\"")){
+        val = GREEN;
+    }
+    else if(strsame(colour, "\"YELLOW\"")){
+        val = YELLOW;
+    }
+    else if(strsame(colour, "\"BLUE\"")){
+        val = BLUE;
+    }
+    else if(strsame(colour, "\"CYAN\"")){
+        val = CYAN;
+    }
+    else{
+        val = MAGENTA;
+    }
+    return val;
+}
+
+void process_colour(Turtle* res, COLOUR colour){
+    res->colour = colour;
+}
+
 
