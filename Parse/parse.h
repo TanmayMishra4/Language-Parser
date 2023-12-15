@@ -1,3 +1,7 @@
+#ifndef PARSER
+#define PARSER
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

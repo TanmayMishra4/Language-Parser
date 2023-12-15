@@ -16,6 +16,8 @@ int main(int argc, char** argv){
     FILE* input_file = fopen(file_name, "r");
     if(input_file == NULL){
         fprintf(stderr, "Cannot open file\n");
+        free(res);
+        fclose(input_file);
         exit(EXIT_FAILURE);
     }
     bool is_valid = interp_file(input_file, res);
@@ -223,13 +225,23 @@ bool check_col(Program* prog, Turtle* res){
         prog->curword++;
         VAR var;
         if(check_var(prog, res, &var)){
+            neillcol colour;
+            bool is_valid = fetch_colour_var(&var, &colour);
+            if(!is_valid){
+                return false;
+            }
+            process_colour(res, colour);
             return true;
         }
         prog->curword = original_curword + 1;
         printf("inside col, word = ");
         puts(prog->words[prog->curword]);
         if(check_word(prog, res)){
-            neillcol colour = fetch_colour(prog, original_curword+1);
+            neillcol colour;
+            bool is_valid = fetch_colour(prog->words[original_curword+1], &colour);
+            if(!is_valid){
+                return false;
+            }
             process_colour(res, colour);
             return true;
         }
@@ -337,31 +349,6 @@ bool check_word(Program* prog, Turtle* res){
         }
     }
 
-    // copy_word_from_str(word, prog->words[curword]);
-    // if(strsame(word, "RED")){
-    //     printf("matched\n");
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "GREEN")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "YELLOW")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "CYAN")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // else if(strsame(word, "MAGENTA")){
-    //     prog->curword++;
-    //     return true;
-    // }
-    // printf("should not be here\n");
-    // prog->curword = original_curword;
-    // return false;
     prog->curword++;
     return true;
 }
@@ -374,8 +361,14 @@ bool check_var(Program* prog, Turtle* res, VAR* var){
         if(is_ltr){
             char var_name = str_to_var(prog->words[curword]);
             int pos = var_name - 'A';
-            var->vartype = prog->variables[pos].vartype;
-            var->numval = prog->variables[pos].numval;
+            // check if variable has been set before
+            if(prog->is_var_used[pos]){
+                var->vartype = prog->variables[pos].vartype;
+                var->numval = prog->variables[pos].numval;
+            }
+            else{
+                return false;
+            }
             return true;
         }
         else{
@@ -640,34 +633,35 @@ void process_rgt(Turtle* res, int angle){
     printf("angle = %.2lf\n", res->angle);
 }
 
-neillcol fetch_colour(Program* prog, int curword){
-    char* colour = prog->words[curword];
-    neillcol val;
+bool fetch_colour(char* colour, neillcol* val){
     if(strsame(colour, "\"WHITE\"")){
-        val = white;
+        *val = white;
     }
     else if(strsame(colour, "\"BLACK\"")){
-        val = black;
+        *val = black;
     }
     else if(strsame(colour, "\"RED\"")){
-        val = red;
+        *val = red;
     }
     else if(strsame(colour, "\"GREEN\"")){
-        val = green;
+        *val = green;
     }
     else if(strsame(colour, "\"YELLOW\"")){
-        val = yellow;
+        *val = yellow;
     }
     else if(strsame(colour, "\"BLUE\"")){
-        val = blue;
+        *val = blue;
     }
     else if(strsame(colour, "\"CYAN\"")){
-        val = cyan;
+        *val = cyan;
+    }
+    else if(strsame(colour, "\"MAGENTA\"")){
+        *val = magenta;
     }
     else{
-        val = magenta;
+        return false;
     }
-    return val;
+    return true;
 }
 
 void process_colour(Turtle* res, neillcol colour){
@@ -696,4 +690,23 @@ void set_var(Program* prog, char var_name, VAR* val){
     printf("var %c set to %lf\n", var_name, prog->variables[pos].numval);
 }
 
+bool fetch_colour_var(VAR* var, neillcol* val){
+    if(var->vartype != STRING){
+        return false;
+    }
+    bool is_val = fetch_colour(var->strval, val);
+    if(is_val){
+        return true;
+    }
+    return false;
+}
+
+bool isnumber(char* str){
+    int val;
+    int numvars = sscanf(str, "%lf", &val);
+    if(numvars == 1){
+        return true;
+    }
+    return false;
+}
 

@@ -29,5 +29,7 @@ do
         esac
     fi  
 done
+echo -e "\n"
+echo "ALL TEST CASES PASSED!!"
 rm testoutput.txt
 
