@@ -76,12 +76,14 @@ Turtle* init_turtle(char* file_name){
 
 bool interp_file(FILE* file, Turtle* res){
     Program* prog = (Program*)calloc(1, sizeof(Program));
+    prog->stack = coll_init();
     int i = 0;
     while(fscanf(file, "%s", prog->words[i++])==1){
         strip_new_line(prog->words[i]);
     }
     fclose(file);
     bool is_valid = check_prog(prog, res);
+    coll_free(prog->stack);
     free(prog);
     return is_valid;
 }
@@ -300,6 +302,7 @@ bool check_set(Program* prog, Turtle* res){
         }
         printf("variable name = %s\n", prog->words[prog->curword-1]);
         char var_name = str_to_var(prog->words[prog->curword-1]);
+        prog->is_var_used[var_name-'A'] = true;
         curword = prog->curword;
         if(!strsame(prog->words[curword], "(")){
             prog->curword = original_curword;
@@ -383,11 +386,20 @@ bool check_var(Program* prog, Turtle* res, VAR* var){
 bool check_pfix(Program* prog, Turtle* res, VAR* var){
     int curword = prog->curword;
     int original_curword = curword;
+    char op;
     if(strsame(prog->words[curword], ")")){
+        coll_pop(prog->stack, var);
         prog->curword++;
         return true;
     }
-    else if(check_op(prog, res)){
+    else if(check_op(prog, res, &op)){
+        if(prog->stack->size <= 1){ //if stack is empty
+            return false;
+        }
+        bool did_update = update_stack(prog->stack, op);
+        if(!did_update){ // check for divide by zero error
+            return false;
+        }
         bool is_valid = check_pfix(prog, res, var);
         if(is_valid){
             return true;
@@ -464,22 +476,26 @@ bool check_num(Program* prog, Turtle* res, VAR* var){
     return  true;
 }
 
-bool check_op(Program* prog, Turtle* res){
+bool check_op(Program* prog, Turtle* res, char* op){
     int curword = prog->curword;
     if(strsame(prog->words[curword], "+")){
         prog->curword++;
+        op[0] = '+';
         return true;
     }
     else if(strsame(prog->words[curword], "-")){
         prog->curword++;
+        op[0] = '-';
         return true;
     }
     else if(strsame(prog->words[curword], "*")){
         prog->curword++;
+        op[0] = '*';
         return true;
     }
     else if(strsame(prog->words[curword], "/")){
         prog->curword++;
+        op[0] = '/';
         return true;
     }
     else{
@@ -708,5 +724,80 @@ bool isnumber(char* str){
         return true;
     }
     return false;
+}
+
+// STACK FUNCTIONS
+
+coll* coll_init(void)
+{
+    coll* c = (coll*) calloc(1, sizeof(coll));
+    c->size = 0;
+    return c;
+}
+
+int coll_size(coll* c)
+{
+    if(c==NULL){
+        return 0;
+    }
+    return c->size;
+}
+
+void coll_add(coll* c, VAR d)
+{
+    if(c){
+        int size = c->size;
+        if(size >= STACKSIZE){
+            fprintf(stderr, "STACK COLLECTION OVERFLOW in stack.h\n");
+            exit(EXIT_FAILURE);
+        }
+        c->a[size].vartype = d.vartype;
+        c->a[size].numval = d.numval;
+        strcpy(c->a[size].strval, d.strval);
+        c->size = c->size + 1;
+    }
+}
+
+bool coll_pop(coll* c, VAR* res){
+    if(!c || c->size == 0){
+        return false;
+    }
+    int size = c->size;
+    VAR top = c->a[size-1];
+    res->vartype = top.vartype;
+    res->numval = top.numval;
+    strcpy(res->strval, top.strval);
+    return true;
+}
+
+bool coll_free(coll* c)
+{
+    free(c);
+    return true;
+}
+
+bool update_stack(coll* stack, char op){
+    VAR a;
+    VAR b;
+    coll_pop(stack, &a);
+    coll_pop(stack, &b);
+    double res;
+    if(op == '+'){
+        res = b.numval + a.numval;
+    }
+    else if(op == '-'){
+        res = b.numval - a.numval;
+    }
+    else if(op == '*'){
+        res = b.numval * a.numval;
+    }
+    else{
+        if(a.numval == 0){
+            fprintf(stderr, "divide by zero\n");
+            return false;
+        }
+        res = b.numval / a.numval;
+    }
+    return true;
 }
 

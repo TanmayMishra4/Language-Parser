@@ -1,6 +1,6 @@
 #ifndef INTERP
 #define INTERP
-#endif
+
 
 #include <stdio.h>
 #include <string.h>
@@ -10,7 +10,7 @@
 #include "../neillsimplescreen.h"
 
 #define PI 3.14159
-#define STACKSIZE
+#define STACKSIZE 1000
 #define MAX_LINE_LENGTH 100
 #define MAXNUMTOKENS 1000
 #define MAXTOKENSIZE 50
@@ -39,11 +39,18 @@ typedef struct VAR{
     double numval;
 } VAR;
 
+typedef struct coll {
+   // Underlying array
+   VAR a[STACKSIZE];
+   int size;
+} coll;
+
 typedef struct prog{
    char words[MAXNUMTOKENS][MAXTOKENSIZE];
    int curword; // Current Word
    VAR variables[NUM_VARS];
    bool is_var_used[NUM_VARS];
+   coll* stack;
 } Program;
 
 typedef struct Turtle{
@@ -74,7 +81,7 @@ bool check_pfix(Program* prog, Turtle* res, VAR* val);
 bool check_ltr(Program* prog, int index, Turtle* res);
 bool check_lst(Program* prog, Turtle* res);
 bool check_num(Program* prog, Turtle* res, VAR* num);
-bool check_op(Program* prog, Turtle* res);
+bool check_op(Program* prog, Turtle* res, char* op);
 bool check_items(Program* prog, Turtle* res);
 bool check_item(Program* prog, Turtle* res);
 void get_file_extension(char* file_name, char* extension);
@@ -88,3 +95,15 @@ void process_colour(Turtle* res, neillcol colour);
 char str_to_var(char* str);
 void set_var(Program* prog, char var_name, VAR* val);
 bool fetch_colour_var(VAR* var, neillcol* val);
+bool update_stack(coll* stack, char op);
+
+
+// STACK FUNCTIONS
+coll* coll_init(void);
+int coll_size(coll* c);
+void coll_add(coll* c, VAR  d);
+bool coll_free(coll* c);
+bool coll_pop(coll* c, VAR* res);
+
+#endif
+

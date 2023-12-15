@@ -1,6 +1,5 @@
 #ifndef PARSER
 #define PARSER
-#endif
 
 #include <stdio.h>
 #include <string.h>
@@ -39,3 +38,6 @@ bool check_op(Program* prog);
 bool check_items(Program* prog);
 bool check_item(Program* prog);
 void copy_word_from_str(char* word, char* str);
+
+#endif
+
