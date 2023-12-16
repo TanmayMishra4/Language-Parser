@@ -179,6 +179,7 @@ bool check_fwd(Program* prog, Turtle* res){
         prog->curword++;
         int step_pos = prog->curword;
         VAR var;
+        strcpy(var.strval, "\0");
         bool is_valid = check_varnum(prog, res, &var);
         if(is_valid){
             // int num = fetch_num(prog, step_pos, res);
@@ -203,6 +204,7 @@ bool check_rgt(Program* prog, Turtle* res){
         prog->curword++;
         int step_pos = prog->curword;
         VAR var;
+        strcpy(var.strval, "\0");
         bool is_valid = check_varnum(prog, res, &var);
         if(is_valid){
             // int num = fetch_num(prog, step_pos, res);
@@ -226,6 +228,7 @@ bool check_col(Program* prog, Turtle* res){
     if(strsame(prog->words[curword], "COLOUR")){
         prog->curword++;
         VAR var;
+        strcpy(var.strval, "\0");
         if(check_var(prog, res, &var)){
             neillcol colour;
             bool is_valid = fetch_colour_var(&var, &colour);
@@ -268,19 +271,44 @@ bool check_loop(Program* prog, Turtle* res){
         curword =  prog->curword;
         printf("after letter word = ");
         puts(prog->words[prog->curword]);
+        char var_name = str_to_var(prog->words[curword-1]);
+        printf("loop variable = %c\n", var_name);
         if(!strsame(prog->words[curword], "OVER")){
             prog->curword = original_curword;
             return false;
         }
         prog->curword++;
-        if(!check_lst(prog, res)){
+        LOOPLIST loop_lst;
+        loop_lst.size = 0;
+        loop_lst.curr_index = 0;
+        if(!check_lst(prog, res, &loop_lst)){
             prog->curword = original_curword;
             return false;
         }
+        printf("loop items are\n");
+        for(int i=0;i<loop_lst.size;i++){
+            VAR v = loop_lst.list[i];
+            if(v.vartype == STRING){
+                printf("%s ", v.strval);
+            }
+            else{
+                printf("%lf ", v.numval);
+            }
+        }
+        printf("\n");
         // prog-
-        if(!check_inslst(prog, res)){
-            prog->curword = original_curword;
-            return false;
+        // printf("before instlst curwords = %s\n", prog->words[prog->curword]);
+        int pos_before = prog->curword, after_loop;
+        for(int i=0;i<loop_lst.size;i++){
+            prog->curword = pos_before;
+            VAR cur_val = loop_lst.list[i];
+            set_var(prog, var_name, &cur_val);
+            if(!check_inslst(prog, res)){
+                prog->curword = original_curword;
+                return false;
+            }
+            // prog->curword = prog->curword
+            printf("after instlst curwords = %s\n", prog->words[prog->curword]);
         }
         return true;
     }
@@ -310,6 +338,7 @@ bool check_set(Program* prog, Turtle* res){
         }
         prog->curword++;
         VAR val;
+        strcpy(val.strval, "\0");
         if(!check_pfix(prog, res, &val)){
             prog->curword = original_curword;
             return false;
@@ -368,6 +397,7 @@ bool check_var(Program* prog, Turtle* res, VAR* var){
             if(prog->is_var_used[pos]){
                 var->vartype = prog->variables[pos].vartype;
                 var->numval = prog->variables[pos].numval;
+                strcpy(var->strval, prog->variables[pos].strval);
             }
             else{
                 return false;
@@ -430,7 +460,7 @@ bool check_pfix(Program* prog, Turtle* res, VAR* var){
 bool check_ltr(Program* prog, int index, Turtle* res){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
-    printf("inside ltr curword = %i, word = ", curword);
+    printf("inside ltr curword = %i, index = %i, word = ", curword, index);
     puts(prog->words[curword]);
     if(len < 1 || len > 2){
         return false;
@@ -445,14 +475,14 @@ bool check_ltr(Program* prog, int index, Turtle* res){
 
 }
 
-bool check_lst(Program* prog, Turtle* res){
+bool check_lst(Program* prog, Turtle* res, LOOPLIST* loop_lst){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside lst curword = %i, word = ", curword);
     puts(prog->words[curword]);
     if(strsame(prog->words[curword], "{")){
         prog->curword++;
-        bool is_valid = check_items(prog, res);
+        bool is_valid = check_items(prog, res, loop_lst);
         if(is_valid){
             return true;
         }
@@ -475,6 +505,7 @@ bool check_num(Program* prog, Turtle* res, VAR* var){
     }
     var->vartype = DOUBLE;
     var->numval = num;
+    strcpy(var->strval, "\0");
     prog->curword++;
     return  true;
 }
@@ -506,7 +537,7 @@ bool check_op(Program* prog, Turtle* res, char* op){
     }
 }
 
-bool check_items(Program* prog, Turtle* res){
+bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst){
     int curword = prog->curword;
     int original_curword = curword;
     printf("inside items curword = %i, word = ", curword);
@@ -515,9 +546,9 @@ bool check_items(Program* prog, Turtle* res){
         prog->curword++;
         return true;
     }
-    bool is_valid = check_item(prog, res);
+    bool is_valid = check_item(prog, res, loop_lst);
     if(is_valid){
-        bool is_items = check_items(prog, res);
+        bool is_items = check_items(prog, res, loop_lst);
         if(is_items){
             return true;
         }
@@ -532,20 +563,25 @@ bool check_items(Program* prog, Turtle* res){
     }
 }
 
-bool check_item(Program* prog, Turtle* res){
+bool check_item(Program* prog, Turtle* res, LOOPLIST* loop_lst){
     int original_curword = prog->curword;
     printf("inside item, word = ");
     puts(prog->words[original_curword]);
     VAR var;
+    strcpy(var.strval, "\0");
     bool is_varnum = check_varnum(prog, res, &var);
     if(is_varnum){
+        add_to_looplist(loop_lst, var);
         return true;
     }
     prog->curword = original_curword;
     printf("inside item, word = ");
     puts(prog->words[prog->curword]);
+    var.vartype = STRING;
+    strcpy(var.strval, prog->words[prog->curword]);
     bool is_word = check_word(prog, res);
     if(is_word){
+        add_to_looplist(loop_lst, var);
         return true;
     }
     prog->curword = original_curword;
@@ -581,20 +617,22 @@ void print_to_file(Program* prog, Turtle* res, int num){
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
         printf("num = %i\n", num);
         char colour = convert_colour_to_char(res->colour);
-        int multiplier = (num >= 0?1:-1);
+        double multiplier = (num >= 0?1.0:-1.0);
         num = (int)abs(num);
         for(int i=0;i<num;i++){
             int x, y;
-            printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
-            res->row = res->row + multiplier*cos(angle);
-            res->col = res->col + multiplier*sin(angle);
+            printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
             y = (int)(res->row);
             x = (int)(res->col);
+            res->row = res->row + multiplier*cos(angle);
+            res->col = res->col + multiplier*sin(angle);
             // res->row = y;
             // res->col = x;
             printf("coordinates = %i, %i\n", y, x);
             res->matrix[y][x] = colour;
         }
+        // res->row = res->row - multiplier*cos(angle);
+        // res->col = res->col - multiplier*sin(angle);
         // // res->row = res->row - cos(angle);
         // // res->col = res->col - sin(angle); 
     }
@@ -708,8 +746,10 @@ void set_var(Program* prog, char var_name, VAR* val){
     int pos = var_name - 'A';
     prog->variables[pos].numval = val->numval;
     prog->variables[pos].vartype = val->vartype;
+    strcpy(prog->variables[pos].strval, val->strval);
     prog->is_var_used[pos] = true;
     printf("var %c set to %lf\n", var_name, prog->variables[pos].numval);
+    puts(prog->variables[pos].strval);
 }
 
 bool fetch_colour_var(VAR* var, neillcol* val){
@@ -785,7 +825,9 @@ bool coll_free(coll* c)
 
 bool update_stack(coll* stack, char op){
     VAR a;
+    strcpy(a.strval, "\0");
     VAR b;
+    strcpy(b.strval, "\0");
     coll_pop(stack, &a);
     coll_pop(stack, &b);
     printf("values on stack = %lf, %lf\n", a.numval, b.numval);
@@ -807,9 +849,18 @@ bool update_stack(coll* stack, char op){
         res = b.numval / a.numval;
     }
     VAR c;
+    strcpy(c.strval, "\0");
     c.vartype = DOUBLE;
     c.numval = res;
     coll_add(stack, c);
     return true;
+}
+
+void add_to_looplist(LOOPLIST* looplst, VAR d){
+    int size = looplst->size;
+    looplst->list[size].vartype = d.vartype;
+    looplst->list[size].numval = d.numval;
+    strcpy(looplst->list[size].strval, d.strval);
+    looplst->size = size + 1;
 }
 

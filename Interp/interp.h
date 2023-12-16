@@ -39,6 +39,12 @@ typedef struct VAR{
     double numval;
 } VAR;
 
+typedef struct LOOPLIST{
+    VAR list[MAXNUMTOKENS];
+    int size;
+    int curr_index;
+} LOOPLIST;
+
 typedef struct coll {
    // Underlying array
    VAR a[STACKSIZE];
@@ -79,11 +85,11 @@ bool check_word(Program* prog, Turtle* res);
 bool check_var(Program* prog, Turtle* res, VAR* num);
 bool check_pfix(Program* prog, Turtle* res, VAR* val);
 bool check_ltr(Program* prog, int index, Turtle* res);
-bool check_lst(Program* prog, Turtle* res);
+bool check_lst(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 bool check_num(Program* prog, Turtle* res, VAR* num);
 bool check_op(Program* prog, Turtle* res, char* op);
-bool check_items(Program* prog, Turtle* res);
-bool check_item(Program* prog, Turtle* res);
+bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst);
+bool check_item(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 void get_file_extension(char* file_name, char* extension);
 void print_to_file(Program* prog, Turtle* res, int num);
 int fetch_num(Program* prog, int step_pos, Turtle* res);
@@ -96,6 +102,7 @@ char str_to_var(char* str);
 void set_var(Program* prog, char var_name, VAR* val);
 bool fetch_colour_var(VAR* var, neillcol* val);
 bool update_stack(coll* stack, char op);
+void add_to_looplist(LOOPLIST* looplst, VAR d);
 
 
 // STACK FUNCTIONS
