@@ -392,7 +392,7 @@ bool check_pfix(Program* prog, Turtle* res, VAR* var){
         prog->curword++;
         return true;
     }
-    else if(check_op(prog, res, &op)){
+    if(check_op(prog, res, &op)){
         if(prog->stack->size <= 1){ //if stack is empty
             return false;
         }
@@ -409,7 +409,10 @@ bool check_pfix(Program* prog, Turtle* res, VAR* var){
             return false;
         }
     }
-    else if(check_varnum(prog, res, var)){
+    printf("curword = %s is not operator\n", prog->words[prog->curword]);
+    if(check_varnum(prog, res, var)){
+        printf("inside pfix, added %lf to stack\n", var->numval);
+        coll_add(prog->stack, *var);
         bool is_valid = check_pfix(prog, res, var);
         if(is_valid){
             return true;
@@ -576,14 +579,17 @@ void print_to_file(Program* prog, Turtle* res, int num){
 
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
+        printf("num = %i\n", num);
         char colour = convert_colour_to_char(res->colour);
+        int multiplier = (num >= 0?1:-1);
+        num = (int)abs(num);
         for(int i=0;i<num;i++){
             int x, y;
             printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));
+            res->row = res->row + multiplier*cos(angle);
+            res->col = res->col + multiplier*sin(angle);
             y = (int)(res->row);
             x = (int)(res->col);
-            res->row = res->row + cos(angle);
-            res->col = res->col + sin(angle);
             // res->row = y;
             // res->col = x;
             printf("coordinates = %i, %i\n", y, x);
@@ -718,7 +724,7 @@ bool fetch_colour_var(VAR* var, neillcol* val){
 }
 
 bool isnumber(char* str){
-    int val;
+    double val;
     int numvars = sscanf(str, "%lf", &val);
     if(numvars == 1){
         return true;
@@ -767,6 +773,7 @@ bool coll_pop(coll* c, VAR* res){
     res->vartype = top.vartype;
     res->numval = top.numval;
     strcpy(res->strval, top.strval);
+    c->size = c->size-1;
     return true;
 }
 
@@ -781,6 +788,7 @@ bool update_stack(coll* stack, char op){
     VAR b;
     coll_pop(stack, &a);
     coll_pop(stack, &b);
+    printf("values on stack = %lf, %lf\n", a.numval, b.numval);
     double res;
     if(op == '+'){
         res = b.numval + a.numval;
@@ -798,6 +806,10 @@ bool update_stack(coll* stack, char op){
         }
         res = b.numval / a.numval;
     }
+    VAR c;
+    c.vartype = DOUBLE;
+    c.numval = res;
+    coll_add(stack, c);
     return true;
 }
 
