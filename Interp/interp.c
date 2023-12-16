@@ -49,22 +49,27 @@ int main(int argc, char** argv){
 
 Turtle* init_turtle(char* file_name){
     Turtle* res = (Turtle*)calloc(1, sizeof(Turtle));
-    res->angle = INITIAL_ANGLE;
     res->colour = white;
     if(file_name != NULL){
         char extension[10] = {0};
         get_file_extension(file_name, extension);
-        if(strsame(extension, ".ps")){
+        printf("extension is %s\n", extension);
+        if(strsame(extension, "ps")){
+            res->file = fopen(file_name, "w");
+            printf("file is postscript file\n");
             res->filetype = POSTSCRIPT_FILE;
-            res->row = (double)RESHEIGHT/2;
-            res->col = (double)RESWIDTH/2;
+            res->row = PSHEIGHT;
+            res->angle = INITIALPS_ANGLE;
+            res->col = PSWIDTH;
+            fprintf(res->file, "%s %s\n", "0.2", "setlinewidth");
+            fprintf(res->file, "%s %s %s\n", "10", "10", "scale");
         }
         else{
+            res->angle = INITIAL_ANGLE;
             res->filetype = TEXT_FILE;
             res->row = (double)RESHEIGHT/2;
             res->col = (double)RESWIDTH/2;
         }
-        res->file = fopen(file_name, "w");
     }
     else{
         res->filetype = NO_FILE;
@@ -183,7 +188,7 @@ bool check_fwd(Program* prog, Turtle* res){
         bool is_valid = check_varnum(prog, res, &var);
         if(is_valid){
             // int num = fetch_num(prog, step_pos, res);
-            int num = (int)var.numval;
+            double num = var.numval;
             print_to_file(prog, res, num);
             return true;
         }
@@ -609,17 +614,17 @@ int fetch_num(Program* prog, int step_pos, Turtle* res){
     return 1;
 }
 // TODO check for out of bounds
-void print_to_file(Program* prog, Turtle* res, int num){
+void print_to_file(Program* prog, Turtle* res, double num){
     double angle = ((double)res->angle*PI)/180;
     if(res->filetype == NO_FILE){ // terminal case
 
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
-        printf("num = %i\n", num);
+        printf("num = %lf\n", num);
         char colour = convert_colour_to_char(res->colour);
         double multiplier = (num >= 0?1.0:-1.0);
-        num = (int)abs(num);
-        for(int i=0;i<num;i++){
+        num = fabs(num);
+        for(int i=0;i<(int)num;i++){
             int x, y;
             printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
             y = (int)(res->row);
@@ -637,7 +642,14 @@ void print_to_file(Program* prog, Turtle* res, int num){
         // // res->col = res->col - sin(angle); 
     }
     else{ // Post Script FILE case
-
+        double x1, x2, y1, y2;
+        x1 = res->col;
+        y1 = res->row;
+        x2 = res->col - (double)num*sin(angle);
+        y2 = res->row + (double)num*cos(angle);
+        res->col = x2;
+        res->row = y2;
+        write_to_ps(res, x1, x2, y1, y2);
     }
 }
 
@@ -684,6 +696,15 @@ void write_to_file(Turtle* res, char* file_name){
             fprintf(file, "%c", '\n');
         }
         fclose(file);
+    }
+    else if(res->filetype == POSTSCRIPT_FILE){
+        fprintf(res->file, "%s", "showpage\n");
+        fclose(res->file);
+        char command[COMMAND_LEN] = {0};
+        get_command(command, file_name);
+        printf("command = \n");
+        puts(command);
+        system(command);
     }
 }
 // TODO check if angle shoule be double or int
@@ -862,5 +883,69 @@ void add_to_looplist(LOOPLIST* looplst, VAR d){
     looplst->list[size].numval = d.numval;
     strcpy(looplst->list[size].strval, d.strval);
     looplst->size = size + 1;
+}
+
+void write_to_ps(Turtle* res, double x1, double x2, double y1, double y2){
+    fprintf(res->file, "newpath\n");
+    fprintf(res->file, "%lf %lf moveto\n", x1, y1);
+    fprintf(res->file, "%lf %lf lineto\n", x2, y2);
+    double r, g, b;
+    getrgbcolor(res->colour, &r, &g, &b);
+    fprintf(res->file, "%.1lf %.1lf %.1lf setrgbcolor\n", r, g, b);
+    fprintf(res->file, "stroke\n");
+}
+
+void getrgbcolor(neillcol colour, double* r, double* g, double* b){
+    switch(colour){
+        case black:
+            *r = 0;
+            *g = 0;
+            *b = 0;
+            return;
+        case red:
+            *r = 1;
+            *g = 0;
+            *b = 0;
+            return;
+        case blue:
+            *r = 0;
+            *g = 0;
+            *b = 1;
+            return;
+        case green:
+            *r = 0;
+            *g = 1;
+            *b = 0;
+            return;
+        case cyan:
+            *r = 0;
+            *g = 1;
+            *b = 1;
+            return;
+        case yellow:
+            *r = 1;
+            *g = 1;
+            *b = 0;
+            return;
+        case magenta:
+            *r = 1;
+            *g = 0;
+            *b = 1;
+            return;
+        default:
+            *r = 0.8;
+            *g = 0.8;
+            *b = 0.8;
+            return;
+    }
+}
+
+void get_command(char* command, char* file_name){
+    strcpy(command, "ps2pdf ");
+    char outputfile[COMMAND_LEN]= {0};
+    strcpy(outputfile, file_name);
+    strcat(command, outputfile);
+    strcat(command, " output.pdf");
+    // TODO change output name to something relevant
 }
 

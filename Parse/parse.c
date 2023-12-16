@@ -14,6 +14,7 @@ int main(int argc, char** argv){
     bool is_valid = parse_file(input_file);
     fclose(input_file);
     if(is_valid){
+        printf("Parsed OK\n");
         return 0;
     }
     else{

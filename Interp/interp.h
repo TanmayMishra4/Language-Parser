@@ -11,11 +11,15 @@
 
 #define PI 3.14159
 #define STACKSIZE 1000
+#define INITIALPS_ANGLE 0
 #define MAX_LINE_LENGTH 100
 #define MAXNUMTOKENS 1000
 #define MAXTOKENSIZE 50
+#define COMMAND_LEN 200
 #define RESWIDTH 51
 #define RESHEIGHT 33
+#define PSWIDTH 30
+#define PSHEIGHT 40
 #define TERMINALHEIGHT 33
 #define TERMINALWIDTH 51
 #define strsame(A,B) (strcmp(A, B)==0)
@@ -91,7 +95,7 @@ bool check_op(Program* prog, Turtle* res, char* op);
 bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 bool check_item(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 void get_file_extension(char* file_name, char* extension);
-void print_to_file(Program* prog, Turtle* res, int num);
+void print_to_file(Program* prog, Turtle* res, double num);
 int fetch_num(Program* prog, int step_pos, Turtle* res);
 void process_rgt(Turtle* res, int angle);
 char convert_colour_to_char(neillcol colour);
@@ -103,6 +107,9 @@ void set_var(Program* prog, char var_name, VAR* val);
 bool fetch_colour_var(VAR* var, neillcol* val);
 bool update_stack(coll* stack, char op);
 void add_to_looplist(LOOPLIST* looplst, VAR d);
+void write_to_ps(Turtle* res, double x1, double x2, double y1, double y2);
+void getrgbcolor(neillcol colour, double* r, double* g, double* b);
+void get_command(char* command, char* input_file);
 
 
 // STACK FUNCTIONS
