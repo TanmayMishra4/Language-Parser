@@ -38,6 +38,29 @@ void neillreset(void)
    printf("\033[0m");
 }
 
+void neillmoverowsdown(int n){
+   printf("\033[%iA", n);
+}
+
+void neillmovecolsright(int n){
+   printf("\033[%iC", n);
+}
+
+void neillmoverowsup(int n){
+   printf("\033[%iA", n);
+}
+
+void neillmovecolsleft(int n){
+   printf("\033[%iD", n);
+}
+
+void neillmovecursortopos(int r, int c){
+   neillcursorhome();
+   neillmoverowsdown(r);
+   neillmovecolsright(c);
+}
+
+
 /* May the coding Gods forgive this code
    You really want to give time to other
    processes, rather than sit in a busy loop */

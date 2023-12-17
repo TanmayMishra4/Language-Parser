@@ -83,6 +83,7 @@ Turtle* init_turtle(char* file_name){
         res->filetype = NO_FILE;
         res->row = (double)TERMINALHEIGHT/2;
         res->col = (double)TERMINALWIDTH/2;
+        initializescreen(res);
     }
     return res;
 }
@@ -622,10 +623,11 @@ void get_file_extension(char* file_name, char* extension){
 // TODO check for out of bounds
 void print_to_file(Turtle* res, double num){
     double angle = ((double)res->angle*PI)/180;
-    if(res->filetype == NO_FILE){ // terminal case
-
-    }
-    else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
+    // if(res->filetype == NO_FILE){ // terminal case
+    //     int steps = (int)num;
+    //     print_to_screen(res, num);
+    // }
+    if(res->filetype == TEXT_FILE || res->filetype == NO_FILE){ // TEXT FILE CASE
         printf("num = %lf\n", num);
         char colour = convert_colour_to_char(res->colour);
         double multiplier = (num >= 0?1.0:-1.0);
@@ -641,8 +643,11 @@ void print_to_file(Turtle* res, double num){
             // res->col = x;
             printf("coordinates = %i, %i\n", y, x);
             if(x >= 0 &&  y >= 0){
-	        res->matrix[y][x] = colour;
-	    }
+                if(res->filetype == NO_FILE){
+                    print_to_screen(x, y, colour);
+                }
+	            res->matrix[y][x] = colour;
+	        }
         }
         // res->row = res->row - multiplier*cos(angle);
         // res->col = res->col - multiplier*sin(angle);
@@ -987,5 +992,21 @@ void free_turtle(Turtle* res){
         free(res);
         res = NULL;
     }
+}
+// TODO decide defauly bg colour
+void initializescreen(Turtle* res){
+    int r = res->row;
+    int c = res->col;
+    neillclrscrn();
+    neillmovecursortopos(r, c);
+    neillbgcol(BACKGROUND);
+    neillfgcol(res->colour);
+}
+
+void print_to_screen(int x, int y, neillcol colour){
+    neillfgcol(colour);
+    neillmovecursortopos(y, x);
+    char c = convert_colour_to_char(colour);
+    printf("%c", c);
 }
 

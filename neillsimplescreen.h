@@ -20,3 +20,8 @@ void neillfgcol(const neillcol c);
 void neillbgcol(const neillcol c);
 void neillreset(void);
 void neillbusywait(const double secs);
+void neillmoverowsdown(int n);
+void neillmovecolsright(int n);
+void neillmoverowsup(int n);
+void neillmovecolsleft(int n);
+void neillmovecursortopos(int r, int c);
