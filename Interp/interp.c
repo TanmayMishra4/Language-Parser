@@ -22,7 +22,7 @@ int main(int argc, char** argv){
         exit(EXIT_FAILURE);
     }
     bool is_valid = interp_file(input_file, res);
-    fclose(input_file);
+    // fclose(input_file);
     if(is_valid){
         if(argc == 3){ // output file case
             write_to_file(res, argv[2]);
@@ -39,7 +39,7 @@ int main(int argc, char** argv){
             //     // fclose(res->file);
             //     // res->file = NULL;
             // }
-            fclose(input_file);
+            // fclose(input_file);
             free_turtle(res);
         }
         return 0;
