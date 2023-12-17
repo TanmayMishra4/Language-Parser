@@ -17,6 +17,7 @@ int main(int argc, char** argv){
     if(input_file == NULL){
         fprintf(stderr, "Cannot open file\n");
         free_turtle(res);
+        printf("closing file at line 20\n");
         fclose(input_file);
         exit(EXIT_FAILURE);
     }
@@ -26,22 +27,25 @@ int main(int argc, char** argv){
         if(argc == 3){ // output file case
             write_to_file(res, argv[2]);
             if(res->file){
+                printf("closing file at line 30\n");
                 fclose(res->file);
                 res->file = NULL;
             }
             free_turtle(res);
         }
         else if(argc == 2){ // no output file case
-            if(res->file){
-                fclose(res->file);
-                res->file = NULL;
-            }
+            // if(res->file){
+            //     printf("closing file at line 723\n");
+            //     // fclose(res->file);
+            //     // res->file = NULL;
+            // }
+            fclose(input_file);
             free_turtle(res);
         }
         return 0;
     }
     else{
-        if(res->file){
+        if(res->filetype != NO_FILE && res->file){
             fclose(res->file);
             res->file = NULL;
         }
@@ -53,6 +57,7 @@ int main(int argc, char** argv){
 Turtle* init_turtle(char* file_name){
     Turtle* res = (Turtle*)calloc(1, sizeof(Turtle));
     res->colour = white;
+    res->file = NULL;
     if(file_name != NULL){
         char extension[10] = {0};
         get_file_extension(file_name, extension);
@@ -715,10 +720,12 @@ void write_to_file(Turtle* res, char* file_name){
             printf("\n");
             fprintf(file, "%c", '\n');
         }
+        printf("closing file at line 719\n");
         fclose(file);
     }
     else if(res->filetype == POSTSCRIPT_FILE){
         fprintf(res->file, "%s", "showpage\n");
+        printf("closing file at line 724\n");
         fclose(res->file);
         char command[COMMAND_LEN] = {0};
         get_command(command, file_name);
