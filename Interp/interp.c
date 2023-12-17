@@ -640,7 +640,9 @@ void print_to_file(Turtle* res, double num){
             // res->row = y;
             // res->col = x;
             printf("coordinates = %i, %i\n", y, x);
-            res->matrix[y][x] = colour;
+            if(x >= 0 &&  y >= 0){
+	        res->matrix[y][x] = colour;
+	    }
         }
         // res->row = res->row - multiplier*cos(angle);
         // res->col = res->col - multiplier*sin(angle);
