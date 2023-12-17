@@ -110,6 +110,7 @@ void add_to_looplist(LOOPLIST* looplst, VAR d);
 void write_to_ps(Turtle* res, double x1, double x2, double y1, double y2);
 void getrgbcolor(neillcol colour, double* r, double* g, double* b);
 void get_command(char* command, char* input_file);
+void free_turtle(Turtle* res);
 
 
 // STACK FUNCTIONS

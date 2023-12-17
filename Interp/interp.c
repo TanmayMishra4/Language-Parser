@@ -16,7 +16,7 @@ int main(int argc, char** argv){
     FILE* input_file = fopen(file_name, "r");
     if(input_file == NULL){
         fprintf(stderr, "Cannot open file\n");
-        free(res);
+        free_turtle(res);
         fclose(input_file);
         exit(EXIT_FAILURE);
     }
@@ -24,25 +24,28 @@ int main(int argc, char** argv){
     // fclose(input_file);
     if(is_valid){
         if(argc == 3){ // output file case
+            write_to_file(res, argv[2]);
             if(res->file){
-                write_to_file(res, argv[2]);
                 fclose(res->file);
+                res->file = NULL;
             }
-            free(res);
+            free_turtle(res);
         }
         else if(argc == 2){ // no output file case
             if(res->file){
                 fclose(res->file);
+                res->file = NULL;
             }
-            free(res);
+            free_turtle(res);
         }
         return 0;
     }
     else{
         if(res->file){
             fclose(res->file);
+            res->file = NULL;
         }
-        free(res);
+        free_turtle(res);
         return 1;
     }
 }
@@ -638,8 +641,27 @@ void print_to_file(Program* prog, Turtle* res, double num){
         }
         // res->row = res->row - multiplier*cos(angle);
         // res->col = res->col - multiplier*sin(angle);
-        // // res->row = res->row - cos(angle);
-        // // res->col = res->col - sin(angle); 
+        // res->row = res->row - cos(angle);
+        // res->col = res->col - sin(angle); 
+        // double x1, x2, y1, y2;
+        // x1 = res->col;
+        // y1 = res->row;
+        // x2 = res->col + num*sin(angle);
+        // y2 = res->row + num*cos(angle);
+        // double diffx = x2-x1;
+        // double diffy = y2-y1;
+        // int n  = num;
+        // int i = 0;
+        // while(i < num){
+        //     x1 = x1 + diffx/n;
+        //     y1 = y1 + diffy/n;
+        //     int y = (int)y1;
+        //     int x = (int)x1;
+        //     res->matrix[y][x] =colour;
+        //     i++;
+        // }
+        // res->col = x2;
+        // res->row = y2;
     }
     else{ // Post Script FILE case
         double x1, x2, y1, y2;
@@ -840,8 +862,12 @@ bool coll_pop(coll* c, VAR* res){
 
 bool coll_free(coll* c)
 {
-    free(c);
-    return true;
+    if(c){
+        free(c);
+        c = NULL;
+        return true;
+    }
+    return false;
 }
 
 bool update_stack(coll* stack, char op){
@@ -947,5 +973,12 @@ void get_command(char* command, char* file_name){
     strcat(command, outputfile);
     strcat(command, " output.pdf");
     // TODO change output name to something relevant
+}
+
+void free_turtle(Turtle* res){
+    if(res){
+        free(res);
+        res = NULL;
+    }
 }
 
