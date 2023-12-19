@@ -5,7 +5,8 @@ touch testoutput.txt
 directory=`ls TTLs/`
 for i in $directory
 do
-    timeout 20 ./interp_n TTLs/$i "$i_output.ps" > testoutput.txt
+    echo "output_${i:0:3}.ps"
+    timeout 20 ./interp_n TTLs/$i "output_${i:0:3}.ps" > testoutput.txt
     r=$?
     if [ "$i" = "fail_parse_ok_interp.ttl" ] || [ "$i" = "ok_parse_fail_interp.ttl" ]; then
         case $r in
