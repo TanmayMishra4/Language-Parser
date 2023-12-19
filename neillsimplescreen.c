@@ -55,7 +55,10 @@ void neillmovecolsleft(int n){
 }
 
 void neillmovecursortopos(int r, int c){
+   // FILE* fp = fopen("/dev/ttys003", "w");
+   // fprintf(fp, "r = %d, c = %i\n", r, c);
    printf("\033[%d;%dH", r, c);
+   // fclose(fp);
 }
 
 

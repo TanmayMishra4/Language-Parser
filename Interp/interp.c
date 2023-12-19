@@ -89,9 +89,10 @@ Turtle* init_turtle(char* file_name){
         res->angle = INITIAL_ANGLE;
         res->filetype = NO_FILE;
         tc_enter_alt_screen();
-        res->row = (double)(size.ws_col/2);
-        res->col = (double)(size.ws_row/2);
-        initializescreen(res);
+        // printf("colsize = %ui, rowsize = %ui\n", size.ws_col, size.ws_row);
+        res->row = (double)(size.ws_row/2);
+        res->col = (double)(size.ws_col/2);
+        // initializescreen(res);
     }
     return res;
 }
