@@ -55,9 +55,7 @@ void neillmovecolsleft(int n){
 }
 
 void neillmovecursortopos(int r, int c){
-   neillcursorhome();
-   neillmoverowsdown(r);
-   neillmovecolsright(c);
+   printf("\033[%d;%dH", r, c);
 }
 
 

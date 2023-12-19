@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/ioctl.h>
 #include <stdbool.h>
 #include "../neillsimplescreen.h"
 
@@ -25,6 +26,9 @@
 #define strsame(A,B) (strcmp(A, B)==0)
 #define NUM_VARS 27
 #define INITIAL_ANGLE 180
+#define tc_enter_alt_screen() puts("\033[?1049h\033[H")
+#define tc_exit_alt_screen() puts("\033[?1049l")
+
 
 typedef enum FILETYPE{
     TEXT_FILE,
@@ -112,8 +116,7 @@ void getrgbcolor(neillcol colour, double* r, double* g, double* b);
 void get_command(char* command, char* input_file);
 void free_turtle(Turtle* res);
 void initializescreen(Turtle* res);
-void print_to_screen(int x, int y, neillcol colour);
-
+void print_to_screen(int x, int y, char colour);
 
 // STACK FUNCTIONS
 coll* coll_init(void);
