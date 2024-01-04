@@ -73,6 +73,8 @@ Turtle* init_turtle(char* file_name){
             res->row = PSHEIGHT;
             res->angle = INITIALPS_ANGLE;
             res->col = PSWIDTH;
+            res->maxrow = PSHEIGHT*2;
+            res->maxcol = PSWIDTH*2;
             fprintf(res->file, "%s %s\n", "0.2", "setlinewidth");
             fprintf(res->file, "%s %s %s\n", "10", "10", "scale");
         }
@@ -81,15 +83,19 @@ Turtle* init_turtle(char* file_name){
             res->filetype = TEXT_FILE;
             res->row = (double)RESHEIGHT/2;
             res->col = (double)RESWIDTH/2;
+            res->maxrow = (double)(RESHEIGHT);
+            res->maxcol = (double)(RESWIDTH);
         }
     }
     else{
         struct winsize size;
         ioctl(1, TIOCGWINSZ, &size);
-        res->angle = INITIAL_ANGLE;
+        res->angle = TERMINALANGLE;
         res->filetype = NO_FILE;
         tc_enter_alt_screen();
         // printf("colsize = %ui, rowsize = %ui\n", size.ws_col, size.ws_row);
+        res->maxrow = (double)(size.ws_row);
+        res->maxcol = (double)(size.ws_col);
         res->row = (double)(size.ws_row/2);
         res->col = (double)(size.ws_col/2);
         // initializescreen(res);
@@ -206,7 +212,10 @@ bool check_fwd(Program* prog, Turtle* res){
         if(is_valid){
             // int num = fetch_num(prog, step_pos, res);
             double num = var.numval;
-            print_to_file(res, num);
+            bool is_val = print_to_file(res, num);
+            if(is_val == false){
+                return false;
+            }
             return true;
         }
         else{
@@ -393,7 +402,7 @@ bool check_word(Program* prog){
     // puts(prog->words[curword]);
     // int original_curword = curword;
     int len = strlen(prog->words[curword]);
-    if(prog->words[curword][0] != '"' && prog->words[curword][len-1] != '"'){
+    if(prog->words[curword][0] != '"' || prog->words[curword][len-1] != '"'){
         return false;
     }
     for(int i=1;i<len-1;i++){
@@ -630,7 +639,7 @@ void get_file_extension(char* file_name, char* extension){
 //     return 1;
 // }
 // TODO check for out of bounds
-void print_to_file(Turtle* res, double num){
+bool print_to_file(Turtle* res, double num){
     double angle = ((double)res->angle*PI)/180;
     // printf("colour is %u\n", res->colour);
     // printf("colour char is %c\n", convert_colour_to_char(res->colour));
@@ -648,18 +657,21 @@ void print_to_file(Turtle* res, double num){
             x = (int)(res->col);
             int diffy = y - prevy;
             int diffx = x - prevx;
-            // printf("diffy = %i, diffx = %i\n", diffy, diffx);
+            
             res->row = res->row + multiplier*cos(angle);
             res->col = res->col + multiplier*sin(angle);
+            // printf("angle = %lf, rownext = %lf, colnext = %lf\n", res->angle, res->row, res->col);
             // res->row = y;
             // res->col = x;
             
             // printf("coordinates = %i, %i\n", y, x);
-            if(x >= 0 &&  y >= 0){
-                print_to_screen(x, y, colour);
-                fflush(stdout);
-	            // res->matrix[y][x] = colour;
+            if(!is_validcoord(y, x, res->maxrow, res->maxcol)){
+                fprintf(stderr, "limits for row = %lf, col = %lf\n", res->maxrow, res->maxcol);
+	            fprintf(stderr, "Out of bounds for values row = %i, col = %i\n", y, x);
+                return false;
 	        }
+            print_to_screen(x, y, colour);
+            fflush(stdout);
         }
         neillbusywait(1.0);
     }
@@ -673,17 +685,17 @@ void print_to_file(Turtle* res, double num){
             // printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
             y = (int)(res->row);
             x = (int)(res->col);
-            res->row = res->row + multiplier*cos(angle);
+            res->row = res->row - multiplier*cos(angle);
             res->col = res->col + multiplier*sin(angle);
             // res->row = y;
             // res->col = x;
             // printf("coordinates = %i, %i\n", y, x);
-            // if(x >= 0 &&  y >= 0){
-            //     if(res->filetype == NO_FILE){
-            //         print_to_screen(x, y, colour);
-            //     }
-	        //     res->matrix[y][x] = colour;
-	        // }
+            if(!is_validcoord(y, x, res->maxrow, res->maxcol)){
+                fprintf(stderr, "limits for row = %lf, col = %lf\n", res->maxrow, res->maxcol);
+	            fprintf(stderr, "Out of bounds for values row = %i, col = %i\n", y, x);
+                return false;
+	        }
+            res->matrix[y][x] = colour;
         }
         // res->row = res->row - multiplier*cos(angle);
         // res->col = res->col - multiplier*sin(angle);
@@ -719,6 +731,7 @@ void print_to_file(Turtle* res, double num){
         res->row = y2;
         write_to_ps(res, x1, x2, y1, y2);
     }
+    return true;
 }
 
 char convert_colour_to_char(neillcol colour){
@@ -1048,5 +1061,12 @@ void initializescreen(Turtle* res){
 void print_to_screen(int x, int y, char colour){
     neillmovecursortopos(y, x);
     printf("%c", colour);
+}
+
+bool is_validcoord(int r, int c, int m, int n){
+    if(r < 0 || c < 0 || r >= m || c >= n){
+        return false;
+    }
+    return true;
 }
 

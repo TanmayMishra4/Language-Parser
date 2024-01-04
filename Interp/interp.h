@@ -12,7 +12,7 @@
 
 #define PI 3.14159
 #define STACKSIZE 1000
-#define INITIALPS_ANGLE 0
+#define INITIALPS_ANGLE 180
 #define MAX_LINE_LENGTH 100
 #define MAXNUMTOKENS 1000
 #define MAXTOKENSIZE 50
@@ -23,9 +23,10 @@
 #define PSHEIGHT 40
 #define TERMINALHEIGHT 33
 #define TERMINALWIDTH 51
+#define TERMINALANGLE 180
 #define strsame(A,B) (strcmp(A, B)==0)
 #define NUM_VARS 27
-#define INITIAL_ANGLE 180
+#define INITIAL_ANGLE 90
 #define tc_enter_alt_screen() puts("\033[?1049h\033[H")
 #define tc_exit_alt_screen() puts("\033[?1049l")
 
@@ -70,6 +71,7 @@ typedef struct prog{
 typedef struct Turtle{
     char matrix[RESHEIGHT][RESWIDTH];
     double row, col;
+    double maxrow, maxcol;
     FILE* file;
     double angle;
     FILETYPE filetype;
@@ -99,7 +101,7 @@ bool check_op(Program* prog, char* op);
 bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 bool check_item(Program* prog, LOOPLIST* loop_lst);
 void get_file_extension(char* file_name, char* extension);
-void print_to_file(Turtle* res, double num);
+bool print_to_file(Turtle* res, double num);
 // int fetch_num(Program* prog, int step_pos, Turtle* res);
 void process_rgt(Turtle* res, int angle);
 char convert_colour_to_char(neillcol colour);
@@ -117,6 +119,7 @@ void get_command(char* command, char* input_file);
 void free_turtle(Turtle* res);
 void initializescreen(Turtle* res);
 void print_to_screen(int x, int y, char colour);
+bool is_validcoord(int r, int c, int m, int n);
 
 // STACK FUNCTIONS
 coll* coll_init(void);

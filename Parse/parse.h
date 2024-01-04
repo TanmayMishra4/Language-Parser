@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #define MAX_LINE_LENGTH 100
 #define MAXNUMTOKENS 1000
@@ -38,6 +39,19 @@ bool check_op(Program* prog);
 bool check_items(Program* prog);
 bool check_item(Program* prog);
 void copy_word_from_str(char* word, char* str);
+Program* get_program(FILE* file);
+
+// TESTING FUNCTIONS
+void test(void);
+void test_check_ltr(void);
+void test_check_var(void);
+void test_check_num(void);
+void test_check_word(void);
+void test_check_op(void);
+void test_check_varnum(void);
+void test_fwd(void);
+void test_rgt(void);
+void test_col(void);
 
 #endif
 

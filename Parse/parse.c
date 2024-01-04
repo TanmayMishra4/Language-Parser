@@ -1,6 +1,7 @@
 #include "parse.h"
 
 int main(int argc, char** argv){
+    test();
     if(argc != 2){
         fprintf(stderr, "Wrong number of params: Correct usage - ./parse [filename]\n");
         exit(EXIT_FAILURE);
@@ -23,14 +24,19 @@ int main(int argc, char** argv){
 }
 
 bool parse_file(FILE* file){
+    Program* prog = get_program(file);
+    bool is_valid = check_prog(prog);
+    free(prog);
+    return is_valid;
+}
+
+Program* get_program(FILE* file){
     Program* prog = (Program*)calloc(1, sizeof(Program));
     int i = 0;
     while(fscanf(file, "%s", prog->words[i++])==1){
         strip_new_line(prog->words[i]);
     }
-    bool is_valid = check_prog(prog);
-    free(prog);
-    return is_valid;
+    return prog;
 }
 
 void strip_new_line(char* str){
@@ -246,7 +252,10 @@ bool check_varnum(Program* prog){
 bool check_word(Program* prog){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
-    if(prog->words[curword][0] != '"' && prog->words[curword][len-1] != '"'){
+    if(prog->words[curword][0] != '"' || prog->words[curword][len-1] != '"'){
+        return false;
+    }
+    if(len == 2){
         return false;
     }
     for(int i=1;i<len-1;i++){
@@ -421,4 +430,256 @@ void copy_word_from_str(char* word, char* str){
         index++;
     }
 }
+
+// TESTING FUNCTIONS
+
+void test(void){
+    test_check_ltr();
+    test_check_var();
+    test_check_num();
+    test_check_word();
+    test_check_op();
+    test_check_varnum();
+    test_fwd();
+    test_rgt();
+    test_col();
+}
+
+void test_check_ltr(void){
+    FILE* file = fopen("Testing/LTR/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_ltr(prog, 0) == true);
+    fclose(file);
+
+    file = fopen("Testing/LTR/digit.ttl", "r");
+    prog = get_program(file);
+    assert(check_ltr(prog, 0) == false);
+    fclose(file);
+
+    file = fopen("Testing/LTR/smallcase.ttl", "r");
+    prog = get_program(file);
+    assert(check_ltr(prog, 0) == false);
+    fclose(file);
+
+    file = fopen("Testing/LTR/word.ttl", "r");
+    prog = get_program(file);
+    assert(check_ltr(prog, 0) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_check_var(void){
+    FILE* file = fopen("Testing/VAR/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_var(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/VAR/digit.ttl", "r");
+    prog = get_program(file);
+    assert(check_var(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/VAR/smallcase.ttl", "r");
+    prog = get_program(file);
+    assert(check_var(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/VAR/word.ttl", "r");
+    prog = get_program(file);
+    assert(check_var(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/VAR/nodollar.ttl", "r");
+    prog = get_program(file);
+    assert(check_var(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_check_num(void){
+    FILE* file = fopen("Testing/NUM/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_num(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/NUM/bignum.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/NUM/negative.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/NUM/notnum.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_check_word(void){
+    FILE* file = fopen("Testing/WORD/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_word(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/WORD/empty.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/WORD/incomp.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/WORD/notword.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/WORD/number.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_check_op(void){
+    FILE* file = fopen("Testing/OP/add.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_op(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/OP/subtract.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/OP/multiply.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/OP/divide.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/OP/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_check_varnum(void){
+    FILE* file = fopen("Testing/VARNUM/num.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_varnum(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/VARNUM/var.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/VARNUM/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/VARNUM/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_fwd(void){
+    FILE* file = fopen("Testing/FWD/correctnum.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_fwd(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/FWD/correctvar.ttl", "r");
+    prog = get_program(file);
+    assert(check_fwd(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/FWD/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_fwd(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/FWD/mispelled.ttl", "r");
+    prog = get_program(file);
+    assert(check_fwd(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_rgt(void){
+    FILE* file = fopen("Testing/RGT/correctnum.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_rgt(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/RGT/correctvar.ttl", "r");
+    prog = get_program(file);
+    assert(check_rgt(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/RGT/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_rgt(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/RGT/mispelled.ttl", "r");
+    prog = get_program(file);
+    assert(check_rgt(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_col(void){
+    FILE* file = fopen("Testing/COL/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_col(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/COL/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_col(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/COL/invalidcol.ttl", "r");
+    prog = get_program(file);
+    assert(check_col(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/COL/number.ttl", "r");
+    prog = get_program(file);
+    assert(check_col(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/COL/varcol.ttl", "r");
+    prog = get_program(file);
+    assert(check_col(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+
 
