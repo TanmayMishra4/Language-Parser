@@ -1,0 +1,2 @@
+LOOP M OVER { "RED" "BLUE" "9379" 72837 $B }
+END

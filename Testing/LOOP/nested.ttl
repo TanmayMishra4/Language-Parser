@@ -1,0 +1,5 @@
+LOOP M OVER { "RED" "BLUE" "9379" 72837 $B }
+    LOOP C OVER { 24 32947 923 92739 }
+        RIGHT 90
+    END
+END

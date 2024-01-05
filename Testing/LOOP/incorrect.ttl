@@ -1,0 +1,3 @@
+LOOP M { "RED" "BLUE" "9379" 72837 B }
+    FORWARD 5
+END

@@ -52,6 +52,14 @@ void test_check_varnum(void);
 void test_fwd(void);
 void test_rgt(void);
 void test_col(void);
-
+void test_pfix(void);
+void test_set(void);
+void test_item(void);
+void test_items(void);
+void test_lst(void);
+void test_loop(void);
+void test_ins(void);
+void test_inslst(void);
+void test_prog(void);
 #endif
 

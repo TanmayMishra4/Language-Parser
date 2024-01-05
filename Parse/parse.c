@@ -443,6 +443,15 @@ void test(void){
     test_fwd();
     test_rgt();
     test_col();
+    test_pfix();
+    test_set();
+    test_item();
+    test_items();
+    test_lst();
+    test_loop();
+    test_ins();
+    test_inslst();
+    test_prog();
 }
 
 void test_check_ltr(void){
@@ -680,6 +689,259 @@ void test_col(void){
 
     free(prog);
 }
+
+void test_pfix(void){
+    FILE* file = fopen("Testing/PFIX/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_pfix(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/PFIX/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_pfix(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/PFIX/invalidsymbol.ttl", "r");
+    prog = get_program(file);
+    assert(check_pfix(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/PFIX/multiple.ttl", "r");
+    prog = get_program(file);
+    assert(check_pfix(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/PFIX/var.ttl", "r");
+    prog = get_program(file);
+    assert(check_pfix(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/PFIX/varnum.ttl", "r");
+    prog = get_program(file);
+    assert(check_pfix(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_set(void){
+    FILE* file = fopen("Testing/SET/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_set(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/SET/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_set(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/SET/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_set(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/SET/emptyvalue.ttl", "r");
+    prog = get_program(file);
+    assert(check_set(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/SET/pfix.ttl", "r");
+    prog = get_program(file);
+    assert(check_set(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/SET/word.ttl", "r");
+    prog = get_program(file);
+    assert(check_set(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_item(void){
+    // add test case for checking num where num = 563yt
+    FILE* file = fopen("Testing/ITEM/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_item(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/ITEM/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_item(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/ITEM/varnum.ttl", "r");
+    prog = get_program(file);
+    assert(check_item(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/ITEM/varnum2.ttl", "r");
+    prog = get_program(file);
+    assert(check_item(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/ITEM/smallcase.ttl", "r");
+    prog = get_program(file);
+    assert(check_item(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_items(void){
+    FILE* file = fopen("Testing/ITEMS/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_items(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/ITEMS/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_items(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/ITEMS/empty.ttl", "r");
+    prog = get_program(file);
+    assert(check_items(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/ITEMS/words.ttl", "r");
+    prog = get_program(file);
+    assert(check_items(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_lst(void){
+    FILE* file = fopen("Testing/LST/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_lst(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/LST/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_lst(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/LST/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_lst(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/LST/empty.ttl", "r");
+    prog = get_program(file);
+    assert(check_lst(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_loop(void){
+    FILE* file = fopen("Testing/LOOP/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_loop(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/LOOP/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_loop(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/LOOP/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_loop(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/LOOP/noloopbody.ttl", "r");
+    prog = get_program(file);
+    assert(check_loop(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/LOOP/nested.ttl", "r");
+    prog = get_program(file);
+    assert(check_loop(prog) == true);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_ins(void){
+    FILE* file = fopen("Testing/INS/col.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_ins(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INS/fwd.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INS/rgt.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INS/loop.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INS/rgt.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INS/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/INS/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_ins(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_inslst(void){
+    FILE* file = fopen("Testing/LST/correct.ttl", "r");
+    Program* prog = get_program(file);
+    // assert(check_inslst(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INSLST/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_inslst(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/INSLST/emptyfile.ttl", "r");
+    prog = get_program(file);
+    assert(check_inslst(prog) == false);
+    fclose(file);
+
+    file = fopen("Testing/INSLST/empty.ttl", "r");
+    prog = get_program(file);
+    assert(check_inslst(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INSLST/multiple.ttl", "r");
+    prog = get_program(file);
+    assert(check_inslst(prog) == true);
+    fclose(file);
+
+    file = fopen("Testing/INSLST/noend.ttl", "r");
+    prog = get_program(file);
+    assert(check_inslst(prog) == false);
+    fclose(file);
+
+    free(prog);
+}
+
+void test_prog(void){
+
+}
+
 
 
 
