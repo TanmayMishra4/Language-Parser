@@ -26,7 +26,7 @@
 #define TERMINALANGLE 180
 #define strsame(A,B) (strcmp(A, B)==0)
 #define NUM_VARS 27
-#define INITIAL_ANGLE 90
+#define INITIAL_ANGLE 0
 #define tc_enter_alt_screen() puts("\033[?1049h\033[H")
 #define tc_exit_alt_screen() puts("\033[?1049l")
 

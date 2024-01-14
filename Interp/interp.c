@@ -237,7 +237,6 @@ bool check_rgt(Program* prog, Turtle* res){
         strcpy(var.strval, "\0");
         bool is_valid = check_varnum(prog, &var);
         if(is_valid){
-            // int num = fetch_num(prog, step_pos, res);
             int num = (int)var.numval;
             process_rgt(res, num);
             return true;
@@ -793,7 +792,13 @@ void write_to_file(Turtle* res, char* file_name){
 // TODO check if angle shoule be double or int
 // TODO check if %360 is possible or not
 void process_rgt(Turtle* res, int angle){
-    res->angle = res->angle - angle;
+    if(res->filetype == TEXT_FILE){
+        res->angle = res->angle + angle;
+    }
+    else{
+        res->angle = res->angle - angle;
+    }
+    
     // printf("angle = %.2lf\n", res->angle);
 }
 
