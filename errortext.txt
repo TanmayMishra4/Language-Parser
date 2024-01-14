@@ -1,4 +1,34 @@
-START
-	COLOUR "RED"
-	FORWARD 500
-END
+                                                   
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+

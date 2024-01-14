@@ -18,6 +18,8 @@ interp_s: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.
 	$(CC) neillsimplescreen.c Interp/interp.c -o interp_s -I./Interp $(SANITIZE) -lm
 
 ### An example : you may wish to adapt this slightly
+extension_n: Extension/extension.h Extension/extension.c neillsimplescreen.c neillsimplescreen.h
+	$(CC) neillsimplescreen.c Extension/extension.c -o extension_n -I./Extension -lm
 extension_s: Extension/extension.h Extension/extension.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Extension/extension.c -o extension_s -I./Extension $(SANITIZE) -lm
 
