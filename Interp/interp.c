@@ -401,6 +401,9 @@ bool check_word(Program* prog){
     // puts(prog->words[curword]);
     // int original_curword = curword;
     int len = strlen(prog->words[curword]);
+    if(len <= 2){
+        return false;
+    }
     if(prog->words[curword][0] != '"' || prog->words[curword][len-1] != '"'){
         return false;
     }
@@ -1094,11 +1097,11 @@ void free_prog(Program* prog){
 void test(void){
     test_check_ltr();
     test_check_var();
-    // test_check_num();
-    // test_check_word();
-    // test_check_op();
-    // test_check_varnum();
-    // test_fwd();
+    test_check_num();
+    test_check_word();
+    test_check_op();
+    test_check_varnum();
+    test_fwd();
     // test_rgt();
     // test_col();
     // test_pfix();
@@ -1196,135 +1199,186 @@ void test_check_var(void){
     free_prog(prog);
 }
 
-// void test_check_num(void){
-//     FILE* file = fopen("Testing/NUM/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_num(prog) == true);
-//     fclose(file);
+void test_check_num(void){
+    FILE* file = fopen("Testing/NUM/correct.ttl", "r");
+    Program* prog = get_program(file);
+    VAR var;
+    assert(check_num(prog, &var) == true);
+    assert(var.vartype == DOUBLE);
+    assert(var.numval > 384.727 && var.numval < 384.729);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/NUM/bignum.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_num(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/NUM/negative.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog, &var) == true);
+    assert(var.vartype == DOUBLE);
+    assert(var.numval > -32468 && var.numval < -32466);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/NUM/negative.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_num(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/NUM/bignum.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog, &var) == true);
+    assert(var.vartype == DOUBLE);
+    assert(var.numval > 2934928 && var.numval < 2934930);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/NUM/notnum.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_num(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/NUM/notnum.ttl", "r");
+    prog = get_program(file);
+    assert(check_num(prog, &var) == false);
+    fclose(file);
+    free_prog(prog);
+}
 
-//     free_prog(prog);
-// }
+void test_check_word(void){
+    FILE* file = fopen("Testing/WORD/correct.ttl", "r");
+    Program* prog = get_program(file);
+    assert(check_word(prog) == true);
+    fclose(file);
+    free_prog(prog);
 
-// void test_check_word(void){
-//     FILE* file = fopen("Testing/WORD/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_word(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/WORD/empty.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/WORD/empty.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_word(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/WORD/incomp.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/WORD/incomp.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_word(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/WORD/notword.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == false);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/WORD/notword.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_word(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/WORD/number.ttl", "r");
+    prog = get_program(file);
+    assert(check_word(prog) == true);
+    fclose(file);
 
-//     file = fopen("Testing/WORD/number.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_word(prog) == true);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     free_prog(prog);
-// }
+void test_check_op(void){
+    FILE* file = fopen("Testing/OP/add.ttl", "r");
+    Program* prog = get_program(file);
+    char op;
+    assert(check_op(prog, &op) == true);
+    assert(op == '+');
+    fclose(file);
+    free_prog(prog);
 
-// void test_check_op(void){
-//     FILE* file = fopen("Testing/OP/add.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_op(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/OP/subtract.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog, &op) == true);
+    assert(op == '-');
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/OP/subtract.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_op(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/OP/multiply.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog, &op) == true);
+    assert(op == '*');
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/OP/multiply.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_op(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/OP/divide.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog, &op) == true);
+    assert(op == '/');
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/OP/divide.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_op(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/OP/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_op(prog, &op) == false);
+    fclose(file);
 
-//     file = fopen("Testing/OP/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_op(prog) == false);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     free_prog(prog);
-// }
+void test_check_varnum(void){
+    FILE* file = fopen("Testing/VARNUM/num.ttl", "r");
+    Program* prog = get_program(file);
+    VAR var;
+    assert(check_varnum(prog, &var) == true);
+    fclose(file);
+    free_prog(prog);
 
-// void test_check_varnum(void){
-//     FILE* file = fopen("Testing/VARNUM/num.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_varnum(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/VARNUM/var.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog, &var) == false);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/VARNUM/var.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_varnum(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/VARNUM/var.ttl", "r");
+    prog = get_program(file);
+    prog->is_var_used['V'-'A'] = true;
+    assert(check_varnum(prog, &var) == true);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/VARNUM/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_varnum(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/VARNUM/incorrect.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog, &var) == false);
+    fclose(file);
+    free_prog(prog);
 
-//     file = fopen("Testing/VARNUM/incorrect2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_varnum(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/VARNUM/incorrect2.ttl", "r");
+    prog = get_program(file);
+    assert(check_varnum(prog, &var) == false);
+    fclose(file);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+}
 
-// void test_fwd(void){
-//     FILE* file = fopen("Testing/FWD/correctnum.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_fwd(prog) == true);
-//     fclose(file);
+void test_fwd(void){
+    FILE* file = fopen("Testing/FWD/correctnum.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    assert(check_fwd(prog, res) == true);
+    assert(res->col > 24 && res->col < 27);
+    assert(res->row > 5 && res->row < 7);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/FWD/correctvar.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_fwd(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/FWD/correctvar.ttl", "r");
+    prog = get_program(file);
+    prog->is_var_used[3] = true;
+    prog->variables[3].vartype = DOUBLE;
+    prog->variables[3].numval = 4.0;
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_fwd(prog, res) == true);
+    assert(res->col > 24 && res->col < 27);
+    assert(res->row > 11 && res->row < 13);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/FWD/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_fwd(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/FWD/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_fwd(prog, res) == false);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/FWD/mispelled.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_fwd(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/FWD/mispelled.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_fwd(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+}
 
 // void test_rgt(void){
 //     FILE* file = fopen("Testing/RGT/correctnum.ttl", "r");
