@@ -459,16 +459,19 @@ void test_check_ltr(void){
     Program* prog = get_program(file);
     assert(check_ltr(prog, 0) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LTR/digit.ttl", "r");
     prog = get_program(file);
     assert(check_ltr(prog, 0) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LTR/smallcase.ttl", "r");
     prog = get_program(file);
     assert(check_ltr(prog, 0) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LTR/word.ttl", "r");
     prog = get_program(file);
@@ -483,21 +486,25 @@ void test_check_var(void){
     Program* prog = get_program(file);
     assert(check_var(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VAR/digit.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VAR/smallcase.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VAR/word.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VAR/nodollar.ttl", "r");
     prog = get_program(file);
@@ -512,16 +519,19 @@ void test_check_num(void){
     Program* prog = get_program(file);
     assert(check_num(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/NUM/bignum.ttl", "r");
     prog = get_program(file);
     assert(check_num(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/NUM/negative.ttl", "r");
     prog = get_program(file);
     assert(check_num(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/NUM/notnum.ttl", "r");
     prog = get_program(file);
@@ -536,21 +546,25 @@ void test_check_word(void){
     Program* prog = get_program(file);
     assert(check_word(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/WORD/empty.ttl", "r");
     prog = get_program(file);
     assert(check_word(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/WORD/incomp.ttl", "r");
     prog = get_program(file);
     assert(check_word(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/WORD/notword.ttl", "r");
     prog = get_program(file);
     assert(check_word(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/WORD/number.ttl", "r");
     prog = get_program(file);
@@ -565,21 +579,25 @@ void test_check_op(void){
     Program* prog = get_program(file);
     assert(check_op(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/OP/subtract.ttl", "r");
     prog = get_program(file);
     assert(check_op(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/OP/multiply.ttl", "r");
     prog = get_program(file);
     assert(check_op(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/OP/divide.ttl", "r");
     prog = get_program(file);
     assert(check_op(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/OP/incorrect.ttl", "r");
     prog = get_program(file);
@@ -594,16 +612,19 @@ void test_check_varnum(void){
     Program* prog = get_program(file);
     assert(check_varnum(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VARNUM/var.ttl", "r");
     prog = get_program(file);
     assert(check_varnum(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VARNUM/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_varnum(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/VARNUM/incorrect2.ttl", "r");
     prog = get_program(file);
@@ -618,16 +639,19 @@ void test_fwd(void){
     Program* prog = get_program(file);
     assert(check_fwd(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/FWD/correctvar.ttl", "r");
     prog = get_program(file);
     assert(check_fwd(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/FWD/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_fwd(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/FWD/mispelled.ttl", "r");
     prog = get_program(file);
@@ -642,16 +666,19 @@ void test_rgt(void){
     Program* prog = get_program(file);
     assert(check_rgt(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/RGT/correctvar.ttl", "r");
     prog = get_program(file);
     assert(check_rgt(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/RGT/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_rgt(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/RGT/mispelled.ttl", "r");
     prog = get_program(file);
@@ -666,21 +693,25 @@ void test_col(void){
     Program* prog = get_program(file);
     assert(check_col(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/COL/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_col(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/COL/invalidcol.ttl", "r");
     prog = get_program(file);
     assert(check_col(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/COL/number.ttl", "r");
     prog = get_program(file);
     assert(check_col(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/COL/varcol.ttl", "r");
     prog = get_program(file);
@@ -695,26 +726,31 @@ void test_pfix(void){
     Program* prog = get_program(file);
     assert(check_pfix(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/PFIX/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_pfix(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/PFIX/invalidsymbol.ttl", "r");
     prog = get_program(file);
     assert(check_pfix(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/PFIX/multiple.ttl", "r");
     prog = get_program(file);
     assert(check_pfix(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/PFIX/var.ttl", "r");
     prog = get_program(file);
     assert(check_pfix(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/PFIX/varnum.ttl", "r");
     prog = get_program(file);
@@ -729,26 +765,31 @@ void test_set(void){
     Program* prog = get_program(file);
     assert(check_set(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/SET/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_set(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/SET/incorrect2.ttl", "r");
     prog = get_program(file);
     assert(check_set(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/SET/emptyvalue.ttl", "r");
     prog = get_program(file);
     assert(check_set(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/SET/pfix.ttl", "r");
     prog = get_program(file);
     assert(check_set(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/SET/word.ttl", "r");
     prog = get_program(file);
@@ -764,21 +805,25 @@ void test_item(void){
     Program* prog = get_program(file);
     assert(check_item(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEM/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_item(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEM/varnum.ttl", "r");
     prog = get_program(file);
     assert(check_item(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEM/varnum2.ttl", "r");
     prog = get_program(file);
     assert(check_item(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEM/smallcase.ttl", "r");
     prog = get_program(file);
@@ -793,16 +838,19 @@ void test_items(void){
     Program* prog = get_program(file);
     assert(check_items(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEMS/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_items(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEMS/empty.ttl", "r");
     prog = get_program(file);
     assert(check_items(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/ITEMS/words.ttl", "r");
     prog = get_program(file);
@@ -817,16 +865,19 @@ void test_lst(void){
     Program* prog = get_program(file);
     assert(check_lst(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LST/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_lst(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LST/incorrect2.ttl", "r");
     prog = get_program(file);
     assert(check_lst(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LST/empty.ttl", "r");
     prog = get_program(file);
@@ -841,21 +892,25 @@ void test_loop(void){
     Program* prog = get_program(file);
     assert(check_loop(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LOOP/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_loop(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LOOP/incorrect2.ttl", "r");
     prog = get_program(file);
     assert(check_loop(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LOOP/noloopbody.ttl", "r");
     prog = get_program(file);
     assert(check_loop(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/LOOP/nested.ttl", "r");
     prog = get_program(file);
@@ -870,31 +925,37 @@ void test_ins(void){
     Program* prog = get_program(file);
     assert(check_ins(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/fwd.ttl", "r");
     prog = get_program(file);
     assert(check_ins(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/rgt.ttl", "r");
     prog = get_program(file);
     assert(check_ins(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/loop.ttl", "r");
     prog = get_program(file);
     assert(check_ins(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/rgt.ttl", "r");
     prog = get_program(file);
     assert(check_ins(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_ins(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INS/incorrect2.ttl", "r");
     prog = get_program(file);
@@ -909,26 +970,31 @@ void test_inslst(void){
     Program* prog = get_program(file);
     // assert(check_inslst(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INSLST/incorrect.ttl", "r");
     prog = get_program(file);
     assert(check_inslst(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INSLST/emptyfile.ttl", "r");
     prog = get_program(file);
     assert(check_inslst(prog) == false);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INSLST/empty.ttl", "r");
     prog = get_program(file);
     assert(check_inslst(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INSLST/multiple.ttl", "r");
     prog = get_program(file);
     assert(check_inslst(prog) == true);
     fclose(file);
+    free(prog);
 
     file = fopen("Testing/INSLST/noend.ttl", "r");
     prog = get_program(file);
