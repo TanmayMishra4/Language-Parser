@@ -643,8 +643,8 @@ bool print_to_file(Turtle* res, double num){
         char colour = convert_colour_to_char(res->colour);
         double multiplier = (num >= 0?1.0:-1.0);
         num = fabs(num);
-        int prevx = (int)res->col;
-        int prevy = (int)res->row;
+        // int prevx = (int)res->col;
+        // int prevy = (int)res->row;
         neillfgcol(res->colour);
         for(int i=0;i<(int)num;i++){
             int x, y;
