@@ -103,6 +103,7 @@ bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 bool check_item(Program* prog, LOOPLIST* loop_lst);
 void get_file_extension(char* file_name, char* extension);
 bool print_to_file(Turtle* res, double num);
+void free_prog(Program* prog);
 
 void process_rgt(Turtle* res, int angle);
 char convert_colour_to_char(neillcol colour);

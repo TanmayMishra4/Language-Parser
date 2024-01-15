@@ -1075,10 +1075,18 @@ bool is_validcoord(int r, int c, int m, int n){
 Program* get_program(FILE* file){
     Program* prog = (Program*)calloc(1, sizeof(Program));
     int i = 0;
+    prog->stack = coll_init();
     while(fscanf(file, "%s", prog->words[i++])==1){
         strip_new_line(prog->words[i]);
     }
     return prog;
+}
+
+void free_prog(Program* prog){
+    if(prog->stack != NULL){
+        free(prog->stack);
+    }
+    free(prog);
 }
 
 // TESTING FUNCTIONS
@@ -1109,23 +1117,26 @@ void test_check_ltr(void){
     Program* prog = get_program(file);
     assert(check_ltr(prog, 0) == true);
     fclose(file);
+    free_prog(prog);
 
     file = fopen("Testing/LTR/digit.ttl", "r");
     prog = get_program(file);
     assert(check_ltr(prog, 0) == false);
     fclose(file);
+    free_prog(prog);
 
     file = fopen("Testing/LTR/smallcase.ttl", "r");
     prog = get_program(file);
     assert(check_ltr(prog, 0) == false);
     fclose(file);
+    free_prog(prog);
 
     file = fopen("Testing/LTR/word.ttl", "r");
     prog = get_program(file);
     assert(check_ltr(prog, 0) == false);
     fclose(file);
 
-    free(prog);
+    free_prog(prog);
 }
 
 void test_check_var(void){
@@ -1134,12 +1145,14 @@ void test_check_var(void){
     Program* prog = get_program(file);
     assert(check_var(prog, &var) == false);
     fclose(file);
+    free_prog(prog);
 
 
     file = fopen("Testing/VAR/digit.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog, &var) == false);
     fclose(file);
+    free_prog(prog);
 
     Turtle* res = init_turtle("test_file_for_tests.txt");
     file = fopen("Testing/VAR/setanduse.ttl", "r");
@@ -1149,6 +1162,7 @@ void test_check_var(void){
     assert(var.vartype == DOUBLE);
     assert(var.numval > 4.9 && var.numval < 5.1);
     fclose(file);
+    free_prog(prog);
     free_turtle(res);
 
     res = init_turtle("test_file_for_tests.txt");
@@ -1159,24 +1173,27 @@ void test_check_var(void){
     assert(var.vartype == DOUBLE);
     assert(var.numval > 11.9 && var.numval < 12.1);
     fclose(file);
+    free_prog(prog);
     free_turtle(res);
 
     file = fopen("Testing/VAR/smallcase.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog, &var) == false);
     fclose(file);
+    free_prog(prog);
 
     file = fopen("Testing/VAR/word.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog, &var) == false);
     fclose(file);
+    free_prog(prog);
 
     file = fopen("Testing/VAR/nodollar.ttl", "r");
     prog = get_program(file);
     assert(check_var(prog, &var) == false);
     fclose(file);
 
-    free(prog);
+    free_prog(prog);
 }
 
 // void test_check_num(void){
@@ -1200,7 +1217,7 @@ void test_check_var(void){
 //     assert(check_num(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_check_word(void){
@@ -1229,7 +1246,7 @@ void test_check_var(void){
 //     assert(check_word(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_check_op(void){
@@ -1258,7 +1275,7 @@ void test_check_var(void){
 //     assert(check_op(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_check_varnum(void){
@@ -1282,7 +1299,7 @@ void test_check_var(void){
 //     assert(check_varnum(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_fwd(void){
@@ -1306,7 +1323,7 @@ void test_check_var(void){
 //     assert(check_fwd(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_rgt(void){
@@ -1330,7 +1347,7 @@ void test_check_var(void){
 //     assert(check_rgt(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_col(void){
@@ -1359,7 +1376,7 @@ void test_check_var(void){
 //     assert(check_col(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_pfix(void){
@@ -1393,7 +1410,7 @@ void test_check_var(void){
 //     assert(check_pfix(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_set(void){
@@ -1427,7 +1444,7 @@ void test_check_var(void){
 //     assert(check_set(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_item(void){
@@ -1457,7 +1474,7 @@ void test_check_var(void){
 //     assert(check_item(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_items(void){
@@ -1481,7 +1498,7 @@ void test_check_var(void){
 //     assert(check_items(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_lst(void){
@@ -1505,7 +1522,7 @@ void test_check_var(void){
 //     assert(check_lst(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_loop(void){
@@ -1534,7 +1551,7 @@ void test_check_var(void){
 //     assert(check_loop(prog) == true);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_ins(void){
@@ -1573,7 +1590,7 @@ void test_check_var(void){
 //     assert(check_ins(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_inslst(void){
@@ -1607,7 +1624,7 @@ void test_check_var(void){
 //     assert(check_inslst(prog) == false);
 //     fclose(file);
 
-//     free(prog);
+//     free_prog(prog);
 // }
 
 // void test_prog(void){
