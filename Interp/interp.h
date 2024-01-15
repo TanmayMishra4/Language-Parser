@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <math.h>
 #include <sys/ioctl.h>
 #include <stdbool.h>
@@ -102,7 +103,7 @@ bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst);
 bool check_item(Program* prog, LOOPLIST* loop_lst);
 void get_file_extension(char* file_name, char* extension);
 bool print_to_file(Turtle* res, double num);
-// int fetch_num(Program* prog, int step_pos, Turtle* res);
+
 void process_rgt(Turtle* res, int angle);
 char convert_colour_to_char(neillcol colour);
 void write_to_file(Turtle* res, char* file_name);
@@ -127,6 +128,29 @@ int coll_size(coll* c);
 void coll_add(coll* c, VAR  d);
 bool coll_free(coll* c);
 bool coll_pop(coll* c, VAR* res);
+Program* get_program(FILE* file);
+
+// TESTING FUNCTIONS
+
+void test(void);
+void test_check_ltr(void);
+void test_check_var(void);
+// void test_check_num(void);
+// void test_check_word(void);
+// void test_check_op(void);
+// void test_check_varnum(void);
+// void test_fwd(void);
+// void test_rgt(void);
+// void test_col(void);
+// void test_pfix(void);
+// void test_set(void);
+// void test_item(void);
+// void test_items(void);
+// void test_lst(void);
+// void test_loop(void);
+// void test_ins(void);
+// void test_inslst(void);
+// void test_prog(void);
 
 #endif
 
