@@ -44,6 +44,7 @@ int main(int argc, char** argv){
             // TODO figure out the end position of the terminal cursor
             // neillmovecursortopos(TERMINALHEIGHT+1, 0);
             char x = getchar();
+            x++;
             tc_exit_alt_screen();
             free_turtle(res);
         }
@@ -173,7 +174,7 @@ bool check_inslst(Program* prog, Turtle* res){
 }
 
 bool check_ins(Program* prog, Turtle* res){
-    int curword = prog->curword;
+    // int curword = prog->curword;
     int original_curword = prog->curword;
     // printf("inside ins curword = %i, word = ", curword);
     // puts(prog->words[curword]);
@@ -650,8 +651,8 @@ bool print_to_file(Turtle* res, double num){
             // printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
             y = (int)(res->row);
             x = (int)(res->col);
-            int diffy = y - prevy;
-            int diffx = x - prevx;
+            // int diffy = y - prevy;
+            // int diffx = x - prevx;
             
             res->row = res->row + multiplier*cos(angle);
             res->col = res->col + multiplier*sin(angle);
