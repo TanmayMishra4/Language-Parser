@@ -317,15 +317,15 @@ bool check_loop(Program* prog, Turtle* res){
             return false;
         }
         // printf("loop items are\n");
-        for(int i=0;i<loop_lst.size;i++){
-            VAR v = loop_lst.list[i];
-            if(v.vartype == STRING){
-                // printf("%s ", v.strval);
-            }
-            else{
-                // printf("%lf ", v.numval);
-            }
-        }
+        // for(int i=0;i<loop_lst.size;i++){
+        //     VAR v = loop_lst.list[i];
+        //     if(v.vartype == STRING){
+        //         // printf("%s ", v.strval);
+        //     }
+        //     else{
+        //         // printf("%lf ", v.numval);
+        //     }
+        // }
         // printf("\n");
         // prog-
         // printf("before instlst curwords = %s\n", prog->words[prog->curword]);
@@ -507,8 +507,7 @@ bool check_ltr(Program* prog, int index){
 bool check_lst(Program* prog, Turtle* res, LOOPLIST* loop_lst){
     int curword = prog->curword;
     int original_curword = curword;
-    // printf("inside lst curword = %i, word = ", curword);
-    // puts(prog->words[curword]);
+
     if(strsame(prog->words[curword], "{")){
         prog->curword++;
         bool is_valid = check_items(prog, res, loop_lst);
@@ -625,6 +624,14 @@ void get_file_extension(char* file_name, char* extension){
     else{
         strcpy(extension, ext+1); 
     }
+}
+
+void print_stack(coll* c){
+    // printf("PRINTING STACK left to right\n");
+    for(int i=0;i<c->size;i++){
+        // printf("%0.4f  ", c->a[i].numval);
+    }
+    // printf("\n");
 }
 // TODO: handle variable case and decide if num is to be int or double!!
 // int fetch_num(Program* prog, int step_pos, Turtle* res){
@@ -908,8 +915,13 @@ void coll_add(coll* c, VAR d)
         }
         c->a[size].vartype = d.vartype;
         c->a[size].numval = d.numval;
-        strcpy(c->a[size].strval, d.strval);
+        if(d.vartype == STRING){
+            strcpy(c->a[size].strval, d.strval);
+        }
+        // printf("stack top is %f\n", d.numval);
         c->size = c->size + 1;
+        // printf("calling from coll_add\n");
+        // print_stack(c);
     }
 }
 
@@ -923,6 +935,8 @@ bool coll_pop(coll* c, VAR* res){
     res->numval = top.numval;
     strcpy(res->strval, top.strval);
     c->size = c->size-1;
+    // printf("calling from coll_pop\n");
+    // print_stack(c);
     return true;
 }
 
@@ -941,6 +955,7 @@ bool update_stack(coll* stack, char op){
     strcpy(a.strval, "\0");
     VAR b;
     strcpy(b.strval, "\0");
+    // printf("values popped = %f, %f\n", b.numval, a.numval);
     coll_pop(stack, &a);
     coll_pop(stack, &b);
     // printf("values on stack = %lf, %lf\n", a.numval, b.numval);
@@ -966,6 +981,9 @@ bool update_stack(coll* stack, char op){
     c.vartype = DOUBLE;
     c.numval = res;
     coll_add(stack, c);
+    // printf("top of stack after op %c is %0.1f\n", op, c.numval);
+    // printf("calling from update stack\n");
+    // print_stack(stack);
     return true;
 }
 
@@ -1102,16 +1120,15 @@ void test(void){
     test_check_op();
     test_check_varnum();
     test_fwd();
-    // test_rgt();
-    // test_col();
-    // test_pfix();
-    // test_set();
-    // test_item();
-    // test_items();
-    // test_lst();
-    // test_loop();
-    // test_ins();
-    // test_inslst();
+    test_rgt();
+    test_col();
+    test_set();
+    test_item();
+    test_items();
+    test_lst();
+    test_loop();
+    test_ins();
+    test_inslst();
     // test_prog();
 }
 
@@ -1380,306 +1397,493 @@ void test_fwd(void){
     free_prog(prog);
 }
 
-// void test_rgt(void){
-//     FILE* file = fopen("Testing/RGT/correctnum.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_rgt(prog) == true);
-//     fclose(file);
+void test_rgt(void){
+    FILE* file = fopen("Testing/RGT/correctnum.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    assert(check_rgt(prog, res) == true);
+    assert(res->angle > 44 && res->angle < 46);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/RGT/correctvar.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_rgt(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/RGT/correctvar.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used['X'-'A'] = true;
+    prog->variables['X'-'A'].vartype = DOUBLE;
+    prog->variables['X'-'A'].numval = 90.0;
+    assert(check_rgt(prog, res) == true);
+    assert(res->angle > 89 && res->angle < 91);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/RGT/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_rgt(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/RGT/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_rgt(prog, res) == false);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/RGT/mispelled.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_rgt(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/RGT/mispelled.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_rgt(prog, res) == false);
+    fclose(file);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+    free_turtle(res);
+}
 
-// void test_col(void){
-//     FILE* file = fopen("Testing/COL/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_col(prog) == true);
-//     fclose(file);
+void test_col(void){
+    FILE* file = fopen("Testing/COL/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    assert(check_col(prog, res) == true);
+    assert(res->colour == yellow);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/COL/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_col(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/COL/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_col(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/COL/invalidcol.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_col(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/COL/invalidcol.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_col(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/COL/number.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_col(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/COL/number.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_col(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/COL/varcol.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_col(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/COL/varcol.ttl", "r");
+    prog = get_program(file);
+    prog->is_var_used[0] = true;
+    prog->variables[0].vartype = STRING;
+    strcpy(prog->variables[0].strval, "\"GREEN\"");
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_col(prog, res) == true);
+    assert(res->colour == green);
+    fclose(file);
+    free_turtle(res);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+}
 
-// void test_pfix(void){
-//     FILE* file = fopen("Testing/PFIX/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_pfix(prog) == true);
-//     fclose(file);
+void test_set(void){
+    FILE* file = fopen("Testing/SET/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == true);
+    assert(prog->is_var_used[0]);
+    assert(prog->variables[0].numval > 3.0 && prog->variables[0].numval < 5.0);
+    assert(prog->variables[0].vartype == DOUBLE);
+    fclose(file);
 
-//     file = fopen("Testing/PFIX/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_pfix(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/SET/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/PFIX/invalidsymbol.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_pfix(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/SET/incorrect2.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/PFIX/multiple.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_pfix(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/SET/emptyvalue.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == true);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/PFIX/var.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_pfix(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/SET/pfix.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == true);
+    assert(prog->is_var_used[0]);
+    assert(prog->variables[0].numval > 2.0 && prog->variables[0].numval < 4.0);
+    assert(prog->variables[0].vartype == DOUBLE);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/PFIX/varnum.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_pfix(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/SET/word.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests");
+    assert(check_set(prog, res) == false);
+    assert(prog->is_var_used[0]);
+    fclose(file);
+    free_turtle(res);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+}
 
-// void test_set(void){
-//     FILE* file = fopen("Testing/SET/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_set(prog) == true);
-//     fclose(file);
+void test_item(void){
+    // add test case for checking num where num = 563yt
+    FILE* file = fopen("Testing/ITEM/correct.ttl", "r");
+    Program* prog = get_program(file);
+    LOOPLIST* looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_item(prog, looplst) == true);
+    assert(looplst->size == 1);
+    assert(looplst->list[0].vartype == STRING);
+    assert(strcmp(looplst->list[0].strval, "\"SDKFNN\"") == 0);
+    fclose(file);
+    free(looplst);
+    free_prog(prog);
 
-//     file = fopen("Testing/SET/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_set(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/ITEM/incorrect.ttl", "r");
+    prog = get_program(file);
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_item(prog, looplst) == false);
+    fclose(file);
+    free(looplst);
+    free_prog(prog);
 
-//     file = fopen("Testing/SET/incorrect2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_set(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/ITEM/varnum.ttl", "r");
+    prog = get_program(file);
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    prog->is_var_used[0] = true;
+    prog->variables[0].numval = 5;
+    prog->variables[0].vartype = DOUBLE;
+    assert(check_item(prog, looplst) == true);
+    assert(looplst->size == 1);
+    assert(looplst->list[0].vartype == DOUBLE);
+    assert(looplst->list[0].numval > 4.0 &&  looplst->list[0].numval < 6.0);
+    fclose(file);
+    free(looplst);
+    free_prog(prog);
 
-//     file = fopen("Testing/SET/emptyvalue.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_set(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/ITEM/varnum2.ttl", "r");
+    prog = get_program(file);
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_item(prog, looplst) == true);
+    assert(looplst->size == 1);
+    assert(looplst->list[0].vartype == DOUBLE);
+    assert(looplst->list[0].numval > 4337.0 &&  looplst->list[0].numval < 4339.0);
+    fclose(file);
+    free(looplst);
+    free_prog(prog);
 
-//     file = fopen("Testing/SET/pfix.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_set(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/ITEM/smallcase.ttl", "r");
+    prog = get_program(file);
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_item(prog, looplst) == true);
+    assert(looplst->size == 1);
+    assert(looplst->list[0].vartype == STRING);
+    assert(strcmp(looplst->list[0].strval, "\"skdjfk\"") == 0);
+    fclose(file);
+    free(looplst);
 
-//     file = fopen("Testing/SET/word.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_set(prog) == false);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     free_prog(prog);
-// }
+void test_items(void){
+    FILE* file = fopen("Testing/ITEMS/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    LOOPLIST* looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_items(prog, res, looplst) == true);
+    assert(looplst->size == 5);
+    assert(looplst->list[2].vartype == DOUBLE);
+    assert(looplst->list[2].numval > 5.0 &&  looplst->list[2].numval < 7.0);
+    assert(looplst->list[3].vartype == DOUBLE);
+    assert(looplst->list[3].numval > 6.0 &&  looplst->list[3].numval < 8.0);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
+    free(looplst);
 
-// void test_item(void){
-//     // add test case for checking num where num = 563yt
-//     FILE* file = fopen("Testing/ITEM/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_item(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/ITEMS/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_items(prog, res, looplst) == false);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
+    free(looplst);
 
-//     file = fopen("Testing/ITEM/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_item(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/ITEMS/empty.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_items(prog, res, looplst) == true);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
+    free(looplst);
 
-//     file = fopen("Testing/ITEM/varnum.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_item(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/ITEMS/words.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_items(prog, res, looplst) == true);
+    assert(looplst->size == 4);
+    assert(looplst->list[1].vartype == STRING);
+    assert(strcmp(looplst->list[1].strval, "\"TWO\"") == 0);
+    assert(looplst->list[3].vartype == STRING);
+    assert(strcmp(looplst->list[3].strval, "\"3182\"") == 0);
+    fclose(file);
+    free(looplst);
+    free_turtle(res);
 
-//     file = fopen("Testing/ITEM/varnum2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_item(prog) == true);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     file = fopen("Testing/ITEM/smallcase.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_item(prog) == true);
-//     fclose(file);
+void test_lst(void){
+    FILE* file = fopen("Testing/LST/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    LOOPLIST* looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    prog->is_var_used[0] = true;
+    prog->variables[0].vartype = DOUBLE;
+    prog->variables[0].numval = 0.56;
+    assert(check_lst(prog, res, looplst) == true);
+    assert(looplst->size == 3);
+    assert(looplst->list[0].vartype == STRING);
+    assert(strcmp(looplst->list[0].strval, "\"sjhf\"") == 0);
+    assert(looplst->list[1].vartype == DOUBLE);
+    assert(looplst->list[1].numval > 558 && looplst->list[1].numval < 560);
+    fclose(file);
+    free(looplst);
+    free_turtle(res);
+    free_prog(prog);
 
-//     free_prog(prog);
-// }
+    file = fopen("Testing/LST/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_lst(prog, res, looplst) == false);
+    fclose(file);
+    free(looplst);
+    free_turtle(res);
+    free_prog(prog);
 
-// void test_items(void){
-//     FILE* file = fopen("Testing/ITEMS/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_items(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/LST/incorrect2.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_lst(prog, res, looplst) == false);
+    fclose(file);
+    free(looplst);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/ITEMS/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_items(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/LST/empty.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    assert(check_lst(prog, res, looplst) == true);
+    assert(looplst->size == 0);
+    fclose(file);
+    free(looplst);
+    free_turtle(res);
 
-//     file = fopen("Testing/ITEMS/empty.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_items(prog) == true);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     file = fopen("Testing/ITEMS/words.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_items(prog) == true);
-//     fclose(file);
+void test_loop(void){
+    FILE* file = fopen("Testing/LOOP/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used[1] = true;
+    prog->variables[1].vartype = DOUBLE;
+    prog->variables[1].numval = 0.9;
+    assert(check_loop(prog, res) == true);
+    assert(prog->is_var_used['M'-'A']);
+    assert(prog->variables['M'-'A'].vartype == DOUBLE);
+    assert(prog->variables['M'-'A'].numval > 0.8 && prog->variables['M'-'A'].numval < 1.0);
+    free_prog(prog);
+    free_turtle(res);
+    fclose(file);
 
-//     free_prog(prog);
-// }
+    file = fopen("Testing/LOOP/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_loop(prog, res) == false);
+    free_prog(prog);
+    free_turtle(res);
+    fclose(file);
 
-// void test_lst(void){
-//     FILE* file = fopen("Testing/LST/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_lst(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/LOOP/incorrect2.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_loop(prog, res) == false);
+    free_prog(prog);
+    free_turtle(res);
+    fclose(file);
 
-//     file = fopen("Testing/LST/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_lst(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/LOOP/noloopbody.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used[1] = true;
+    prog->variables[1].vartype = DOUBLE;
+    prog->variables[1].numval = 0.9;
+    assert(check_loop(prog, res) == true);
+    assert(prog->is_var_used['M'-'A']);
+    assert(prog->variables['M'-'A'].vartype == DOUBLE);
+    assert(prog->variables['M'-'A'].numval > 0.8 && prog->variables['M'-'A'].numval < 1.0);
+    free_prog(prog);
+    free_turtle(res);
+    fclose(file);
 
-//     file = fopen("Testing/LST/incorrect2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_lst(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/LOOP/nested.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used[1] = true;
+    prog->variables[1].vartype = DOUBLE;
+    prog->variables[1].numval = 0.9;
+    assert(check_loop(prog, res) == true);
+    assert(prog->is_var_used['M'-'A']);
+    assert(prog->is_var_used['C'-'A']);
+    assert(prog->variables['M'-'A'].vartype == DOUBLE);
+    assert(prog->variables['M'-'A'].numval > 0.8 && prog->variables['M'-'A'].numval < 1.0);
+    assert(prog->variables['C'-'A'].vartype == DOUBLE);
+    assert(prog->variables['C'-'A'].numval > 92738.0 && prog->variables['C'-'A'].numval < 92740.0);
+    fclose(file);
+    free_turtle(res);
 
-//     file = fopen("Testing/LST/empty.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_lst(prog) == true);
-//     fclose(file);
+    free_prog(prog);
+}
 
-//     free_prog(prog);
-// }
+void test_ins(void){
+    FILE* file = fopen("Testing/INS/col.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    assert(check_ins(prog, res) == true);
+    assert(res->colour == red);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-// void test_loop(void){
-//     FILE* file = fopen("Testing/LOOP/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_loop(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/INS/fwd.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used['T'-'A'] = true;
+    prog->variables['T'-'A'].vartype = DOUBLE;
+    prog->variables['T'-'A'].numval = 8.0;
+    assert(check_ins(prog, res) == true);
+    assert(res->row > 7.0 && res->row < 9.0);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/LOOP/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_loop(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/INS/rgt.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_ins(prog, res) == true);
+    assert(res->angle > 49.0 && res->angle < 51.0);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/LOOP/incorrect2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_loop(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/INS/loop.ttl", "r");
+    prog = get_program(file);
+    prog->is_var_used['G'-'A'] = true;
+    prog->variables['G'-'A'].vartype = DOUBLE;
+    prog->variables['G'-'A'].numval = 8.0;
+    res = init_turtle("test_file_for_tests.txt");
 
-//     file = fopen("Testing/LOOP/noloopbody.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_loop(prog) == true);
-//     fclose(file);
+    assert(check_ins(prog, res) == true);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     file = fopen("Testing/LOOP/nested.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_loop(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/INS/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_ins(prog, res) == false);
+    fclose(file);
+    free_prog(prog);
+    free_turtle(res);
 
-//     free_prog(prog);
-// }
+    file = fopen("Testing/INS/incorrect2.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_ins(prog, res) == false);
+    fclose(file);
 
-// void test_ins(void){
-//     FILE* file = fopen("Testing/INS/col.ttl", "r");
-//     Program* prog = get_program(file);
-//     assert(check_ins(prog) == true);
-//     fclose(file);
+    free_turtle(res);
+    free_prog(prog);
+}
 
-//     file = fopen("Testing/INS/fwd.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == true);
-//     fclose(file);
+void test_inslst(void){
+    FILE* file = fopen("Testing/INSLST/correct.ttl", "r");
+    Program* prog = get_program(file);
+    Turtle* res = init_turtle("test_file_for_tests.txt");
+    assert(check_inslst(prog, res) == true);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/INS/rgt.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/INSLST/incorrect.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_inslst(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/INS/loop.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/INSLST/emptyfile.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_inslst(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/INS/rgt.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == true);
-//     fclose(file);
+    file = fopen("Testing/INSLST/empty.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_inslst(prog, res) == true);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/INS/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/INSLST/multiple.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    prog->is_var_used['L'-'A'] = true;
+    prog->variables['L'-'A'].vartype = DOUBLE;
+    prog->variables['L'-'A'].numval = 8.0;
+    assert(check_inslst(prog, res) == true);
+    fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
-//     file = fopen("Testing/INS/incorrect2.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_ins(prog) == false);
-//     fclose(file);
+    file = fopen("Testing/INSLST/noend.ttl", "r");
+    prog = get_program(file);
+    res = init_turtle("test_file_for_tests.txt");
+    assert(check_inslst(prog, res) == false);
+    fclose(file);
+    free_turtle(res);
 
-//     free_prog(prog);
-// }
+    free_prog(prog);
+}
 
-// void test_inslst(void){
-//     FILE* file = fopen("Testing/LST/correct.ttl", "r");
-//     Program* prog = get_program(file);
-//     // assert(check_inslst(prog) == true);
-//     fclose(file);
-
-//     file = fopen("Testing/INSLST/incorrect.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_inslst(prog) == false);
-//     fclose(file);
-
-//     file = fopen("Testing/INSLST/emptyfile.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_inslst(prog) == false);
-//     fclose(file);
-
-//     file = fopen("Testing/INSLST/empty.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_inslst(prog) == true);
-//     fclose(file);
-
-//     file = fopen("Testing/INSLST/multiple.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_inslst(prog) == true);
-//     fclose(file);
-
-//     file = fopen("Testing/INSLST/noend.ttl", "r");
-//     prog = get_program(file);
-//     assert(check_inslst(prog) == false);
-//     fclose(file);
-
-//     free_prog(prog);
-// }
 
 // void test_prog(void){
 

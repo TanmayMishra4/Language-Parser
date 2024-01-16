@@ -966,9 +966,9 @@ void test_ins(void){
 }
 
 void test_inslst(void){
-    FILE* file = fopen("Testing/LST/correct.ttl", "r");
+    FILE* file = fopen("Testing/INSLST/correct.ttl", "r");
     Program* prog = get_program(file);
-    // assert(check_inslst(prog) == true);
+    assert(check_inslst(prog) == true);
     fclose(file);
     free(prog);
 
