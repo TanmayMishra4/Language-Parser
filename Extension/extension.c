@@ -100,7 +100,6 @@ void startConversion(Turtle* turtle){
     pairList.index = 0;
     pairList.size = 0;
     turtle->visited[initialRow][initialCol] = true;
-    printf("number of cells  = %i\n", turtle->numcells);
     dfs(turtle, initialRow, initialCol, 1, &pairList);
 }
 
@@ -124,7 +123,6 @@ int countAlpha(char* str, Turtle* turtle){
                 break;
             default:
                 freeTurtle(turtle);
-                printf("character = %i\n", ch);
                 printInvalidMessage("Invalid characters present in the file\n");
         }
     }
@@ -135,10 +133,8 @@ void dfs(Turtle* turtle, int initRow, int initCol, int numCells, Pair* pairList)
     if(numCells == turtle->numcells){
         processMoves(turtle, pairList);
         freeTurtle(turtle);
-        printf("Found\n");
         exit(EXIT_SUCCESS);
     }
-    printf("at Cell %i, %i, numcells = %i\n", initRow, initCol, numCells);
     for(int i=0;i<NUMDIRS;i++){
         int newR = initRow + dirr[i];
         int newC = initCol + dirc[i];
@@ -148,7 +144,6 @@ void dfs(Turtle* turtle, int initRow, int initCol, int numCells, Pair* pairList)
             pairList->arr[size][1] = newC;
             pairList->size++;
             turtle->visited[newR][newC] = true;
-            printf("for %i, dirs = %i, %i\n", i, dirr[i], dirc[i]);
             dfs(turtle, newR, newC, numCells+1, pairList);
             pairList->size = size;
             turtle->visited[newR][newC] = false;
@@ -166,7 +161,6 @@ static inline bool isValid(int row, int col){
 void processMoves(Turtle* turtle, Pair* pairList){
     int prevR = RESHEIGHT/2;
     int prevC = RESWIDTH/2;
-    printf("sizse = %i\n", pairList->size);
     fprintf(turtle->op, "START\n");
     for(int i=0;i<pairList->size;i++){
         int nextR = pairList->arr[i][0];
@@ -176,13 +170,12 @@ void processMoves(Turtle* turtle, Pair* pairList){
         prevR = nextR;
         prevC = nextC;
     }
-    fprintf(turtle->op, "END\n");
-    fclose(turtle->op);
+    // fprintf(turtle->op, "END\n");
+    // fclose(turtle->op);
 }
 
 void writeMoves(int prevR, int prevC, int nextR, int nextC, Turtle* turtle){
     int angle = getAngle(prevR, prevC, nextR, nextC);
-    printf("angle for %i, %i to %i, %i = %i\n", prevR, prevC, nextR, nextC, angle);
     if(angle != turtle->angle){
         fprintf(turtle->op, "RIGHT %i\n", turtle->angle - angle);
         turtle->angle = angle;
