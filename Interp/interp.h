@@ -150,6 +150,15 @@ void test_lst(void);
 void test_loop(void);
 void test_ins(void);
 void test_inslst(void);
+void test_process_rgt(void);
+void test_convert_colour_to_char(void);
+void test_fetch_colour(void);
+void test_process_colour(void);
+void test_str_to_var(void);
+void test_is_validcoord(void);
+void test_getrgbcolour(void);
+void test_update_stack(void);
+void test_add_to_looplist(void);
 // void test_prog(void);
 
 #endif

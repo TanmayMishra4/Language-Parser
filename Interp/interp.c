@@ -854,7 +854,7 @@ char str_to_var(char* str){
     }
     else{
         // printf("invalid string passed to str_to_val\n");
-        return 'A';
+        return 'A'+26;
     }
 }
 
@@ -1130,6 +1130,14 @@ void test(void){
     test_ins();
     test_inslst();
     // test_prog();
+    test_process_rgt();
+    test_convert_colour_to_char();
+    test_fetch_colour();
+    test_process_colour();
+    test_str_to_var();
+    test_is_validcoord();
+    test_update_stack();
+    test_add_to_looplist();
 }
 
 void test_check_ltr(void){
@@ -1883,6 +1891,122 @@ void test_inslst(void){
 
     free_prog(prog);
 }
+
+void test_process_rgt(void){
+    Turtle* res = init_turtle("test_file_for_tests");
+    process_rgt(res, 40);
+    assert(res->angle > 39 && res->angle < 41);
+    process_rgt(res, -40);
+    assert(res->angle > -1 && res->angle < 1);
+    free_turtle(res);
+}
+
+void test_convert_colour_to_char(void){
+    char a = convert_colour_to_char((neillcol)black);
+    assert(a == 'K');
+    a = convert_colour_to_char((neillcol)yellow);
+    assert(a == 'Y');
+    a = convert_colour_to_char((neillcol)white);
+    assert(a == 'W');
+    a = convert_colour_to_char((neillcol)green);
+    assert(a == 'G');
+    a = convert_colour_to_char((neillcol)magenta);
+    assert(a == 'M');
+}
+
+void test_fetch_colour(void){
+    char colour[10];
+    strcpy(colour, "\"K\"");
+    neillcol val;
+    fetch_colour(colour, &val);
+    assert(val != black);
+    strcpy(colour, "\"BLUE\"");
+    fetch_colour(colour, &val);
+    assert(val == blue);
+    strcpy(colour, "\"CYAN\"");
+    fetch_colour(colour, &val);
+    assert(val == cyan);
+    strcpy(colour, "\"WHITE\"");
+    fetch_colour(colour, &val);
+    assert(val == white);
+}
+
+void test_process_colour(void){
+    Turtle* res = init_turtle("test_file_for_tests");
+    process_colour(res, black);
+    assert(res->colour == black);
+    process_colour(res, white);
+    assert(res->colour == white);
+    process_colour(res, yellow);
+    assert(res->colour == yellow);
+    process_colour(res, cyan);
+    assert(res->colour == cyan);
+    process_colour(res, red);
+    assert(res->colour == red);
+    free_turtle(res);
+}
+
+void test_str_to_var(void){
+    char var = str_to_var("V");
+    assert(var == 'V');
+    var = str_to_var("$F");
+    assert(var == 'F');
+    var = str_to_var("$L");
+    assert(var == 'L');
+    var = str_to_var("Z");
+    assert(var == 'Z');
+    var = str_to_var("EINC");
+    assert(var == 'A'+26);
+    var = str_to_var("$KAP");
+    assert(var == 'A'+26);
+}
+
+void test_is_validcoord(void){
+    assert(is_validcoord(0, 0, 11, 3));
+    assert(is_validcoord(10, 0, 11, 3));
+    assert(is_validcoord(0, 2, 11, 3));
+    assert(is_validcoord(10, 2, 11, 3));
+    assert(!is_validcoord(11, 0, 11, 3));
+    assert(!is_validcoord(0, 3, 11, 3));
+    assert(!is_validcoord(11, 3, 11, 3));
+    assert(!is_validcoord(0, -8, 11, 3));
+    assert(!is_validcoord(-6, 0, 11, 3));
+}
+
+void test_update_stack(void){
+    coll* stack = coll_init();
+    VAR a, b;
+    a.vartype = DOUBLE;
+    b.vartype = DOUBLE;
+    a.numval = 7.0;
+    b.numval = 1.0;
+    coll_add(stack, a);
+    coll_add(stack, b);
+    update_stack(stack, '+');
+    assert(stack->size == 1);
+    assert(stack->a[stack->size-1].numval > 7.0 && stack->a[stack->size-1].numval < 9.0);
+    coll_free(stack);
+}
+
+void test_add_to_looplist(void){
+    LOOPLIST* looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
+    VAR a;
+    a.vartype = STRING;
+    strcpy(a.strval, "TESTVAL");
+    add_to_looplist(looplst, a);
+    assert(looplst->size ==  1);
+    assert(looplst->list[0].vartype == STRING);
+    assert(strcmp(looplst->list[0].strval, "TESTVAL") == 0);
+    VAR b;
+    b.vartype = DOUBLE;
+    b.numval = 5.0;
+    add_to_looplist(looplst, b);
+    assert(looplst->size ==  2);
+    assert(looplst->list[1].vartype == DOUBLE);
+    assert(looplst->list[1].numval > 4.9 && looplst->list[1].numval < 5.1);
+    free(looplst);
+}
+
 
 
 // void test_prog(void){
