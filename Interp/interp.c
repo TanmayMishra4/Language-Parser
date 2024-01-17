@@ -1502,6 +1502,8 @@ void test_set(void){
     assert(prog->variables[0].numval > 3.0 && prog->variables[0].numval < 5.0);
     assert(prog->variables[0].vartype == DOUBLE);
     fclose(file);
+    free_turtle(res);
+    free_prog(prog);
 
     file = fopen("Testing/SET/incorrect.ttl", "r");
     prog = get_program(file);
