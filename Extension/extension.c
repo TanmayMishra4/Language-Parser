@@ -68,11 +68,16 @@ void strip_new_line(char* str){
 }
 
 void freeTurtle(Turtle* turtle){
+    if(turtle == NULL){
+        return;
+    }
     if(turtle->op != NULL){
         fprintf(turtle->op, "END\n");
         fclose(turtle->op);
+        turtle->op = NULL;
     }
     free(turtle);
+    turtle = NULL;
 }
 
 void printInvalidMessage(char* str){
