@@ -48,8 +48,6 @@ Turtle* initTurtle(FILE* op){
     return res;
 }
 void convertToMatrix(Turtle* turtle, FILE* ip){
-    int row = 0, col = 0;
-    char ch;
     int res = 0;
     int i = 0;
     while(fgets(turtle->matrix[RESHEIGHT - i++], RESWIDTH*2, ip)){
@@ -93,7 +91,6 @@ void startConversion(Turtle* turtle){
         freeTurtle(turtle);
         printInvalidMessage(str);
     }
-    int initialCells = 1;
     static Pair pairList;
     pairList.index = 0;
     pairList.size = 0;
