@@ -11,18 +11,23 @@ parse_n: Parse/parse.h Parse/parse.c
 	$(CC) Parse/parse.c -o parse_n -I./Parse -lm
 parse_s: Parse/parse.h Parse/parse.c
 	$(CC) Parse/parse.c -o parse_s -I./Parse $(SANITIZE) -lm
+parse_v: Parse/parse.h Parse/parse.c
+	$(CC) Parse/parse.c -o parse_v -I./Parse $(VALGRIND) -lm
 
 interp_n: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Interp/interp.c -o interp_n -I./Interp -lm
 interp_s: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Interp/interp.c -o interp_s -I./Interp $(SANITIZE) -lm
+interp_v: Interp/interp.h Interp/interp.c neillsimplescreen.c neillsimplescreen.h
+	$(CC) neillsimplescreen.c Interp/interp.c -o interp_v -I./Interp $(SANITIZE) -lm
 
 ### An example : you may wish to adapt this slightly
 extension_n: Extension/extension.h Extension/extension.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Extension/extension.c -o extension_n -I./Extension -lm
 extension_s: Extension/extension.h Extension/extension.c neillsimplescreen.c neillsimplescreen.h
 	$(CC) neillsimplescreen.c Extension/extension.c -o extension_s -I./Extension $(SANITIZE) -lm
-
+extension_v: Extension/extension.h Extension/extension.c neillsimplescreen.c neillsimplescreen.h
+	$(CC) neillsimplescreen.c Extension/extension.c -o extension_v -I./Extension $(VALGRIND) -lm
 run: all
 	./parse_s TTLs/empty.ttl
 	./parse_s TTLs/forward.ttl

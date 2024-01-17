@@ -50,11 +50,10 @@ Turtle* initTurtle(FILE* op){
 void convertToMatrix(Turtle* turtle, FILE* ip){
     int res = 0;
     int i = 0;
-    while(fgets(turtle->matrix[RESHEIGHT - i++], RESWIDTH*2, ip)){
+    while(i <= RESHEIGHT && fgets(turtle->matrix[RESHEIGHT - i++], RESWIDTH*2, ip)){
         strip_new_line(turtle->matrix[RESHEIGHT - i + 1]);
         res += countAlpha(turtle->matrix[RESHEIGHT - i + 1], turtle);
     }
-    printMatrix(turtle);
     turtle->numcells = res;
 }
 
@@ -87,8 +86,9 @@ void printInvalidMessage(char* str){
 
 void startConversion(Turtle* turtle){
     int initialRow = RESHEIGHT - RESHEIGHT/2;
-    int initialCol = RESWIDTH - RESWIDTH/2;
-
+    int initialCol = RESWIDTH/2;
+    printf("initial row = %i, col = %i\n", initialRow, initialCol);
+    printMatrix(turtle);
     if(turtle->matrix[initialRow][initialCol] == ' '){
         char str[MAX_LINE_LENGTH];
         sprintf(str, "Initial starting point of row = %i, col = %i is empty\n", initialRow, initialCol);
