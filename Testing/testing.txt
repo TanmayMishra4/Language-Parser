@@ -1,1 +1,16 @@
-Nothing here yet
+Testing
+
+For testing, I have employed the approach of functional testing and integration testing. For both the Parser and Interpreter, 
+I followed the order provided by topological sort. This enables testing modules with no dependencies first before progressing 
+to those that require prerequisites. As these prerequisites have already undergone testing due to the topological sort order, 
+it enhances the reliability and robustness of the testing process. I have included various test cases covering edge cases, 
+incorrect inputs, and correct ones.
+
+For the Parser, test files have been created in the Testing folder with subfolders indicating the modules for which they are required. 
+These files exclusively contain the relevant pieces of Turtle (TTL) code needed for testing, eliminating the necessity to test any 
+other modules in the same functional test, apart from the module itself and its prerequisites.
+
+Regarding the Interpreter, the testing strategy closely mirrors the one used for the Parser. One additional aspect is checking the 
+updated field values of the Turtle struct and Program struct. The Turtle struct stores information pertinent to the turtle, such as 
+location coordinates, colur, angle, etc. The Program struct, on the other hand, stores information relevant to the program, such as 
+token position and stack.

@@ -1,1 +1,11 @@
-Nothing here yet
+Extension
+
+For my extension, I have created a program that takes a text file as input and outputs the relevant ttl code for that program. 
+This requires me to find out a hamiltonian path to come up with a possible solution. For finding a hamiltonian path I constructed 
+a graph and then traversed the graph in a depth first search fashion. My approach was mainly based on backtracking. After the traversal, 
+I have an ordered list of coordinates to work with and from there I process them to connect them in the right order. 
+The program works well with graphs which are sparse but the time taken rapidly increases as the graph gets denser with more edges 
+connecting adjacent vertices. This is because of the time complexity of the backtracking approach being O(N*N!) which translates to 
+O(N^(N+1)). Since Hamiltonian path is NP-complete, there is no polynomial time algorithm for solving this problem. 
+The program works by providing output in the form of ttl code which will consist of only 3 simple commands - FORWARD, RIGHT and  COLOUR. 
+These are the only 3 commands required to solve any text file pattern. 
