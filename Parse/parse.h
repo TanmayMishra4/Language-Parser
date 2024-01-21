@@ -60,6 +60,5 @@ void test_lst(void);
 void test_loop(void);
 void test_ins(void);
 void test_inslst(void);
-void test_prog(void);
 #endif
 

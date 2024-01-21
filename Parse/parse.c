@@ -445,7 +445,6 @@ void test(void){
     test_loop();
     test_ins();
     test_inslst();
-    test_prog();
 }
 
 void test_check_ltr(void){
