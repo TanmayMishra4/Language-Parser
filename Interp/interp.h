@@ -159,7 +159,6 @@ void test_is_validcoord(void);
 void test_getrgbcolour(void);
 void test_update_stack(void);
 void test_add_to_looplist(void);
-// void test_prog(void);
 
 #endif
 

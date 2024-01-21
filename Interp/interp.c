@@ -1,5 +1,4 @@
 #include "interp.h"
-// TODO check out of bounds for turtle
 int main(int argc, char** argv){
     test();
     if(argc > 3 || argc < 2){
@@ -18,31 +17,18 @@ int main(int argc, char** argv){
     if(input_file == NULL){
         fprintf(stderr, "Cannot open file\n");
         free_turtle(res);
-        // printf("closing file at line 20\n");
         fclose(input_file);
         exit(EXIT_FAILURE);
     }
     bool is_valid = interp_file(input_file, res);
-    // fclose(input_file);
     if(is_valid){
-        if(argc == 3){ // output file case
+        // Ouput File Case
+        if(argc == 3){
             write_to_file(res, argv[2]);
-            // if(res->file){
-            //     printf("closing file at line 30\n");
-            //     fclose(res->file);
-            //     res->file = NULL;
-            // }
             free_turtle(res);
         }
-        else if(argc == 2){ // no output file case
-            // if(res->file){
-            //     printf("closing file at line 723\n");
-            //     // fclose(res->file);
-            //     // res->file = NULL;
-            // }
-            // fclose(input_file);
-            // TODO figure out the end position of the terminal cursor
-            // neillmovecursortopos(TERMINALHEIGHT+1, 0);
+        else if(argc == 2){
+            // no output file case
             char x = getchar();
             x++;
             tc_exit_alt_screen();
@@ -67,10 +53,8 @@ Turtle* init_turtle(char* file_name){
     if(file_name != NULL){
         char extension[10] = {0};
         get_file_extension(file_name, extension);
-        // printf("extension is %s\n", extension);
         if(strsame(extension, "ps")){
             res->file = fopen(file_name, "w");
-            // printf("file is postscript file\n");
             res->filetype = POSTSCRIPT_FILE;
             res->row = PSHEIGHT;
             res->angle = INITIALPS_ANGLE;
@@ -95,12 +79,10 @@ Turtle* init_turtle(char* file_name){
         res->angle = TERMINALANGLE;
         res->filetype = NO_FILE;
         tc_enter_alt_screen();
-        // printf("colsize = %ui, rowsize = %ui\n", size.ws_col, size.ws_row);
         res->maxrow = (double)(size.ws_row);
         res->maxcol = (double)(size.ws_col);
         res->row = (double)(size.ws_row/2);
         res->col = (double)(size.ws_col/2);
-        // initializescreen(res);
     }
     return res;
 }
@@ -148,8 +130,6 @@ bool check_prog(Program* prog, Turtle* res){
 bool check_inslst(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
-    // printf("inside inslst curword = %i, word = ", curword);
-    // puts(prog->words[curword]);
     if(strsame(prog->words[curword], "END")){
         prog->curword++;
         return true;
@@ -174,10 +154,7 @@ bool check_inslst(Program* prog, Turtle* res){
 }
 
 bool check_ins(Program* prog, Turtle* res){
-    // int curword = prog->curword;
     int original_curword = prog->curword;
-    // printf("inside ins curword = %i, word = ", curword);
-    // puts(prog->words[curword]);
     if(check_fwd(prog, res)){
         return true;
     }
@@ -202,7 +179,7 @@ bool check_ins(Program* prog, Turtle* res){
         return false;
     }
 }
-//<FWD> ::= "FORWARD" <VARNUM>
+
 bool check_fwd(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
@@ -212,7 +189,6 @@ bool check_fwd(Program* prog, Turtle* res){
         strcpy(var.strval, "\0");
         bool is_valid = check_varnum(prog, &var);
         if(is_valid){
-            // int num = fetch_num(prog, step_pos, res);
             double num = var.numval;
             bool is_val = print_to_file(res, num);
             if(is_val == false){
@@ -252,7 +228,7 @@ bool check_rgt(Program* prog, Turtle* res){
         return false;
     }
 }
-// TODO handlew variable colour value and NOTCOLOUR
+
 bool check_col(Program* prog, Turtle* res){
     int curword = prog->curword;
     int original_curword = curword;
@@ -270,8 +246,6 @@ bool check_col(Program* prog, Turtle* res){
             return true;
         }
         prog->curword = original_curword + 1;
-        // printf("inside col, word = ");
-        // puts(prog->words[prog->curword]);
         if(check_word(prog)){
             neillcol colour;
             bool is_valid = fetch_colour(prog->words[original_curword+1], &colour);
@@ -298,12 +272,8 @@ bool check_loop(Program* prog, Turtle* res){
             prog->curword = original_curword;
             return false;
         }
-        // prog->curword++;
         curword =  prog->curword;
-        // printf("after letter word = ");
-        // puts(prog->words[prog->curword]);
         char var_name = str_to_var(prog->words[curword-1]);
-        // printf("loop variable = %c\n", var_name);
         if(!strsame(prog->words[curword], "OVER")){
             prog->curword = original_curword;
             return false;
@@ -316,19 +286,7 @@ bool check_loop(Program* prog, Turtle* res){
             prog->curword = original_curword;
             return false;
         }
-        // printf("loop items are\n");
-        // for(int i=0;i<loop_lst.size;i++){
-        //     VAR v = loop_lst.list[i];
-        //     if(v.vartype == STRING){
-        //         // printf("%s ", v.strval);
-        //     }
-        //     else{
-        //         // printf("%lf ", v.numval);
-        //     }
-        // }
-        // printf("\n");
-        // prog-
-        // printf("before instlst curwords = %s\n", prog->words[prog->curword]);
+
         int pos_before = prog->curword;
         for(int i=0;i<loop_lst.size;i++){
             prog->curword = pos_before;
@@ -338,8 +296,6 @@ bool check_loop(Program* prog, Turtle* res){
                 prog->curword = original_curword;
                 return false;
             }
-            // prog->curword = prog->curword
-            // printf("after instlst curwords = %s\n", prog->words[prog->curword]);
         }
         return true;
     }
@@ -357,7 +313,6 @@ bool check_set(Program* prog, Turtle* res){
             prog->curword = original_curword;
             return false;
         }
-        // printf("variable name = %s\n", prog->words[prog->curword-1]);
         char var_name = str_to_var(prog->words[prog->curword-1]);
         prog->is_var_used[var_name-'A'] = true;
         curword = prog->curword;
@@ -394,12 +349,9 @@ bool check_varnum(Program* prog, VAR* num){
     prog->curword = original_curword;
     return false;
 }
-// TODO: Complete fully, only partially working now
+
 bool check_word(Program* prog){
     int curword = prog->curword;
-    // printf("inside word, word = ");
-    // puts(prog->words[curword]);
-    // int original_curword = curword;
     int len = strlen(prog->words[curword]);
     if(len <= 2){
         return false;
@@ -408,7 +360,9 @@ bool check_word(Program* prog){
         return false;
     }
     for(int i=1;i<len-1;i++){
-        if(prog->words[curword][i] == '"' || prog->words[curword][i] == ' ' || prog->words[curword][i] == '\n' || prog->words[curword][i] == '\t' || prog->words[curword][i] == '\f' || prog->words[curword][i] == '\v'){
+        if(prog->words[curword][i] == '"' || prog->words[curword][i] == ' ' 
+        || prog->words[curword][i] == '\n' || prog->words[curword][i] == '\t' || 
+        prog->words[curword][i] == '\f' || prog->words[curword][i] == '\v'){
             return false;
         }
     }
@@ -455,11 +409,11 @@ bool check_pfix(Program* prog, Turtle* res, VAR* var){
         return true;
     }
     if(check_op(prog, &op)){
-        if(prog->stack->size <= 1){ //if stack is empty
+        if(prog->stack->size <= 1){
             return false;
         }
         bool did_update = update_stack(prog->stack, op);
-        if(!did_update){ // check for divide by zero error
+        if(!did_update){
             return false;
         }
         bool is_valid = check_pfix(prog, res, var);
@@ -471,9 +425,7 @@ bool check_pfix(Program* prog, Turtle* res, VAR* var){
             return false;
         }
     }
-    // printf("curword = %s is not operator\n", prog->words[prog->curword]);
     if(check_varnum(prog, var)){
-        // printf("inside pfix, added %lf to stack\n", var->numval);
         coll_add(prog->stack, *var);
         bool is_valid = check_pfix(prog, res, var);
         if(is_valid){
@@ -568,8 +520,6 @@ bool check_op(Program* prog, char* op){
 bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst){
     int curword = prog->curword;
     int original_curword = curword;
-    // printf("inside items curword = %i, word = ", curword);
-    // puts(prog->words[curword]);
     if(strsame(prog->words[curword], "}")){
         prog->curword++;
         return true;
@@ -593,8 +543,6 @@ bool check_items(Program* prog, Turtle* res, LOOPLIST* loop_lst){
 
 bool check_item(Program* prog, LOOPLIST* loop_lst){
     int original_curword = prog->curword;
-    // printf("inside item, word = ");
-    // puts(prog->words[original_curword]);
     VAR var;
     strcpy(var.strval, "\0");
     bool is_varnum = check_varnum(prog, &var);
@@ -603,8 +551,6 @@ bool check_item(Program* prog, LOOPLIST* loop_lst){
         return true;
     }
     prog->curword = original_curword;
-    // printf("inside item, word = ");
-    // puts(prog->words[prog->curword]);
     var.vartype = STRING;
     strcpy(var.strval, prog->words[prog->curword]);
     bool is_word = check_word(prog);
@@ -626,51 +572,21 @@ void get_file_extension(char* file_name, char* extension){
     }
 }
 
-void print_stack(coll* c){
-    // printf("PRINTING STACK left to right\n");
-    for(int i=0;i<c->size;i++){
-        // printf("%0.4f  ", c->a[i].numval);
-    }
-    // printf("\n");
-}
-// TODO: handle variable case and decide if num is to be int or double!!
-// int fetch_num(Program* prog, int step_pos, Turtle* res){
-//     double num;
-//     if((sscanf(prog->words[step_pos], "%lf", &num) == 1)){
-//         return num;
-//     }
-//     // else{
-//     //     sscanf(prog->words[step_pos], );
-//     // }
-//     return 1;
-// }
-// TODO check for out of bounds
 bool print_to_file(Turtle* res, double num){
     double angle = ((double)res->angle*PI)/180;
-    // printf("colour is %u\n", res->colour);
-    // printf("colour char is %c\n", convert_colour_to_char(res->colour));
     if(res->filetype == NO_FILE){ // terminal case
         char colour = convert_colour_to_char(res->colour);
         double multiplier = (num >= 0?1.0:-1.0);
         num = fabs(num);
-        // int prevx = (int)res->col;
-        // int prevy = (int)res->row;
         neillfgcol(res->colour);
         for(int i=0;i<(int)num;i++){
-            int x, y;
-            // printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
+            int x, y;  
             y = (int)(res->row);
             x = (int)(res->col);
-            // int diffy = y - prevy;
-            // int diffx = x - prevx;
             
             res->row = res->row + multiplier*cos(angle);
             res->col = res->col + multiplier*sin(angle);
-            // printf("angle = %lf, rownext = %lf, colnext = %lf\n", res->angle, res->row, res->col);
-            // res->row = y;
-            // res->col = x;
             
-            // printf("coordinates = %i, %i\n", y, x);
             if(!is_validcoord(y, x, res->maxrow, res->maxcol)){
                 fprintf(stderr, "limits for row = %lf, col = %lf\n", res->maxrow, res->maxcol);
 	            fprintf(stderr, "Out of bounds for values row = %i, col = %i\n", y, x);
@@ -682,20 +598,15 @@ bool print_to_file(Turtle* res, double num){
         neillbusywait(1.0);
     }
     else if(res->filetype == TEXT_FILE){ // TEXT FILE CASE
-        // printf("num = %lf\n", num);
         char colour = convert_colour_to_char(res->colour);
         double multiplier = (num >= 0?1.0:-1.0);
         num = fabs(num);
         for(int i=0;i<(int)num;i++){
             int x, y;
-            // printf("angle = %.2lf, cos(angle) = %.2lf, sine(angle) = %.2lf\n", angle, cos(angle), sin(angle));   
             y = (int)(res->row);
             x = (int)(res->col);
             res->row = res->row - multiplier*cos(angle);
             res->col = res->col + multiplier*sin(angle);
-            // res->row = y;
-            // res->col = x;
-            // printf("coordinates = %i, %i\n", y, x);
             if(!is_validcoord(y, x, res->maxrow, res->maxcol)){
                 fprintf(stderr, "limits for row = %lf, col = %lf\n", res->maxrow, res->maxcol);
 	            fprintf(stderr, "Out of bounds for values row = %i, col = %i\n", y, x);
@@ -703,29 +614,6 @@ bool print_to_file(Turtle* res, double num){
 	        }
             res->matrix[y][x] = colour;
         }
-        // res->row = res->row - multiplier*cos(angle);
-        // res->col = res->col - multiplier*sin(angle);
-        // res->row = res->row - cos(angle);
-        // res->col = res->col - sin(angle); 
-        // double x1, x2, y1, y2;
-        // x1 = res->col;
-        // y1 = res->row;
-        // x2 = res->col + num*sin(angle);
-        // y2 = res->row + num*cos(angle);
-        // double diffx = x2-x1;
-        // double diffy = y2-y1;
-        // int n  = num;
-        // int i = 0;
-        // while(i < num){
-        //     x1 = x1 + diffx/n;
-        //     y1 = y1 + diffy/n;
-        //     int y = (int)y1;
-        //     int x = (int)x1;
-        //     res->matrix[y][x] =colour;
-        //     i++;
-        // }
-        // res->col = x2;
-        // res->row = y2;
     }
     else{ // Post Script FILE case
         double x1, x2, y1, y2;
@@ -768,7 +656,7 @@ char convert_colour_to_char(neillcol colour){
     }
     return val;
 }
-// TODO: handle case for PS file
+
 void write_to_file(Turtle* res, char* file_name){
     if(res->filetype == TEXT_FILE){
         FILE* file = fopen(file_name, "w");
@@ -776,28 +664,21 @@ void write_to_file(Turtle* res, char* file_name){
             for(int col=0;col<RESWIDTH;col++){
                 char c = res->matrix[row][col];
                 c = (c != '\0'?c:' ');
-                // printf("%c", c);
                 fprintf(file, "%c", c);
             }
-            // printf("\n");
             fprintf(file, "%c", '\n');
         }
-        // printf("closing file at line 719\n");
         fclose(file);
     }
     else if(res->filetype == POSTSCRIPT_FILE){
         fprintf(res->file, "%s", "showpage\n");
-        // printf("closing file at line 724\n");
         fclose(res->file);
         char command[COMMAND_LEN] = {0};
         get_command(command, file_name);
-        // printf("command = \n");
-        puts(command);
         system(command);
     }
 }
-// TODO check if angle shoule be double or int
-// TODO check if %360 is possible or not
+
 void process_rgt(Turtle* res, int angle){
     if(res->filetype == TEXT_FILE){
         res->angle = res->angle + angle;
@@ -805,8 +686,6 @@ void process_rgt(Turtle* res, int angle){
     else{
         res->angle = res->angle - angle;
     }
-    
-    // printf("angle = %.2lf\n", res->angle);
 }
 
 bool fetch_colour(char* colour, neillcol* val){
@@ -853,7 +732,6 @@ char str_to_var(char* str){
         return str[1];
     }
     else{
-        // printf("invalid string passed to str_to_val\n");
         return 'A'+26;
     }
 }
@@ -864,8 +742,6 @@ void set_var(Program* prog, char var_name, VAR* val){
     prog->variables[pos].vartype = val->vartype;
     strcpy(prog->variables[pos].strval, val->strval);
     prog->is_var_used[pos] = true;
-    // printf("var %c set to %lf\n", var_name, prog->variables[pos].numval);
-    // puts(prog->variables[pos].strval);
 }
 
 bool fetch_colour_var(VAR* var, neillcol* val){
@@ -918,10 +794,7 @@ void coll_add(coll* c, VAR d)
         if(d.vartype == STRING){
             strcpy(c->a[size].strval, d.strval);
         }
-        // printf("stack top is %f\n", d.numval);
         c->size = c->size + 1;
-        // printf("calling from coll_add\n");
-        // print_stack(c);
     }
 }
 
@@ -935,8 +808,6 @@ bool coll_pop(coll* c, VAR* res){
     res->numval = top.numval;
     strcpy(res->strval, top.strval);
     c->size = c->size-1;
-    // printf("calling from coll_pop\n");
-    // print_stack(c);
     return true;
 }
 
@@ -955,10 +826,8 @@ bool update_stack(coll* stack, char op){
     strcpy(a.strval, "\0");
     VAR b;
     strcpy(b.strval, "\0");
-    // printf("values popped = %f, %f\n", b.numval, a.numval);
     coll_pop(stack, &a);
     coll_pop(stack, &b);
-    // printf("values on stack = %lf, %lf\n", a.numval, b.numval);
     double res;
     if(op == '+'){
         res = b.numval + a.numval;
@@ -970,10 +839,6 @@ bool update_stack(coll* stack, char op){
         res = b.numval * a.numval;
     }
     else{
-        // if(a.numval == 0){
-        //     fprintf(stderr, "divide by zero\n");
-        //     return false;
-        // }
         res = b.numval / a.numval;
     }
     VAR c;
@@ -981,9 +846,6 @@ bool update_stack(coll* stack, char op){
     c.vartype = DOUBLE;
     c.numval = res;
     coll_add(stack, c);
-    // printf("top of stack after op %c is %0.1f\n", op, c.numval);
-    // printf("calling from update stack\n");
-    // print_stack(stack);
     return true;
 }
 
@@ -1061,7 +923,6 @@ void get_command(char* command, char* file_name){
     outputfile[len+1] = '\0';
     strcat(command, " ");
     strcat(command, outputfile);
-    // TODO change output name to something relevant
 }
 
 void free_turtle(Turtle* res){
@@ -1070,15 +931,12 @@ void free_turtle(Turtle* res){
         res = NULL;
     }
 }
-// TODO decide defauly bg colour
+
 void initializescreen(Turtle* res){
     int r = res->row;
     int c = res->col;
     neillclrscrn();
     neillmovecursortopos(r, c);
-    // printf("hello world");
-    // neillbgcol(BACKGROUND);
-    // neillfgcol(res->colour);
 }
 
 void print_to_screen(int x, int y, char colour){
@@ -1129,7 +987,6 @@ void test(void){
     test_loop();
     test_ins();
     test_inslst();
-    // test_prog();
     test_process_rgt();
     test_convert_colour_to_char();
     test_fetch_colour();
@@ -1552,7 +1409,6 @@ void test_set(void){
 }
 
 void test_item(void){
-    // add test case for checking num where num = 563yt
     FILE* file = fopen("Testing/ITEM/correct.ttl", "r");
     Program* prog = get_program(file);
     LOOPLIST* looplst = (LOOPLIST*)calloc(1, sizeof(LOOPLIST));
@@ -2009,9 +1865,4 @@ void test_add_to_looplist(void){
     free(looplst);
 }
 
-
-
-// void test_prog(void){
-
-// }
 

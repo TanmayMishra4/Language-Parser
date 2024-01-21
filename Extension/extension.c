@@ -170,8 +170,6 @@ void processMoves(Turtle* turtle, Pair* pairList){
         prevR = nextR;
         prevC = nextC;
     }
-    // fprintf(turtle->op, "END\n");
-    // fclose(turtle->op);
 }
 
 void writeMoves(int prevR, int prevC, int nextR, int nextC, Turtle* turtle){

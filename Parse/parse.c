@@ -185,7 +185,6 @@ bool check_loop(Program* prog){
             prog->curword = original_curword;
             return false;
         }
-        // prog->curword++;
         curword =  prog->curword;
         if(!strsame(prog->words[curword], "OVER")){
             prog->curword = original_curword;
@@ -196,7 +195,6 @@ bool check_loop(Program* prog){
             prog->curword = original_curword;
             return false;
         }
-        // prog-
         if(!check_inslst(prog)){
             prog->curword = original_curword;
             return false;
@@ -248,7 +246,7 @@ bool check_varnum(Program* prog){
     prog->curword = original_curword;
     return false;
 }
-// TODO: Complete fully, only partially working now
+
 bool check_word(Program* prog){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
@@ -315,7 +313,7 @@ bool check_pfix(Program* prog){
         return false;
     }
 }
-// TODO : see for $A and A 
+
 bool check_ltr(Program* prog, int index){
     int curword = prog->curword;
     int len = strlen(prog->words[curword]);
@@ -800,7 +798,6 @@ void test_set(void){
 }
 
 void test_item(void){
-    // add test case for checking num where num = 563yt
     FILE* file = fopen("Testing/ITEM/correct.ttl", "r");
     Program* prog = get_program(file);
     assert(check_item(prog) == true);
@@ -1002,10 +999,6 @@ void test_inslst(void){
     fclose(file);
 
     free(prog);
-}
-
-void test_prog(void){
-
 }
 
 
