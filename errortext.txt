@@ -1,10 +1,34 @@
-START
-RIGHT -90
-COLOUR "BLACK"
-FORWARD 3
-LOOP C OVER { 1 2 3 }
-    COLOUR "WHITE"
-    RIGHT -120
-    FORWARD 11
-END
-END
+                                                   
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         W                         
+                         M                         
+                         K                         
+                         G                         
+                         Y                         
+                         C                         
+                         B                         
+                         W                         
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+                                                   
+

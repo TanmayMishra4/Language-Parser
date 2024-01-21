@@ -257,7 +257,9 @@ bool check_word(Program* prog){
         return false;
     }
     for(int i=1;i<len-1;i++){
-        if(prog->words[curword][i] == '"' || prog->words[curword][i] == ' ' || prog->words[curword][i] == '\n' || prog->words[curword][i] == '\t' || prog->words[curword][i] == '\f' || prog->words[curword][i] == '\v'){
+        if(prog->words[curword][i] == '"' || prog->words[curword][i] == ' ' 
+        || prog->words[curword][i] == '\n' || prog->words[curword][i] == '\t' 
+        || prog->words[curword][i] == '\f' || prog->words[curword][i] == '\v'){
             return false;
         }
     }
@@ -294,24 +296,18 @@ bool check_pfix(Program* prog){
         if(is_valid){
             return true;
         }
-        else{
-            prog->curword = original_curword;
-            return false;
-        }
+        prog->curword = original_curword;
+        return false;
     }
     else if(check_varnum(prog)){
         bool is_valid = check_pfix(prog);
         if(is_valid){
             return true;
         }
-        else{
-            prog->curword = original_curword;
-            return false;
-        }
-    }
-    else{
+        prog->curword = original_curword;
         return false;
     }
+    return false;
 }
 
 bool check_ltr(Program* prog, int index){

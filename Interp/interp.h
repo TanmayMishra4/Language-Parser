@@ -80,6 +80,7 @@ typedef struct Turtle{
 } Turtle;
 
 bool interp_file(FILE* file, Turtle* res);
+void processFile(bool is_valid, int argc, char** argv, Turtle* res);
 bool isnumber(char* str);
 void strip_new_line(char* str);
 Turtle* init_turtle(char* file_name);

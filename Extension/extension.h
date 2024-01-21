@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <ctype.h>
+#include <assert.h>
 #include <sys/ioctl.h>
 #include <stdbool.h>
 #include "../neillsimplescreen.h"
@@ -95,7 +96,16 @@ void writeMoves(int prevR, int prevC, int nextR, int nextC, Turtle* turtle);
 int getAngle(int prevR, int prevC, int nextR, int nextC);
 void checkColour(int prevR, int prevC, int nextR, int nextC, Turtle* turtle);
 void getColour(char ch, char colour[10]);
-void printMatrix(Turtle* turtle);
+
+// TESTING FUNCTIONS
+
+void test(void);
+void test_initTurtle(void);
+void testCountAlpha(void);
+void testIsValid(void);
+void testGetAngle(void);
+void testGetColour(void);
+void testCheckColour(void);
 
 #endif
 

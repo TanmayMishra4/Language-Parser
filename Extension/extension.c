@@ -1,6 +1,7 @@
 #include "extension.h"
 
 int main(int argc, char** argv){
+    test();
     if(argc != 3){
         fprintf(stderr, "Wrong number of params: Correct usage - ./extension [input file] [output file]\n");
         exit(EXIT_FAILURE);
@@ -87,12 +88,9 @@ void printInvalidMessage(char* str){
 void startConversion(Turtle* turtle){
     int initialRow = RESHEIGHT - RESHEIGHT/2;
     int initialCol = RESWIDTH/2;
-    printf("initial row = %i, col = %i\n", initialRow, initialCol);
-    printMatrix(turtle);
     if(turtle->matrix[initialRow][initialCol] == ' '){
         char str[MAX_LINE_LENGTH];
         sprintf(str, "Initial starting point of row = %i, col = %i is empty\n", initialRow, initialCol);
-        puts(str);
         freeTurtle(turtle);
         printInvalidMessage(str);
     }
@@ -247,15 +245,88 @@ void getColour(char ch, char colour[10]){
     }
 }
 
-void printMatrix(Turtle* turtle){
-    for(int i=0;i<RESHEIGHT;i++){
-        for(int j=0;j<RESWIDTH;j++){
-            printf("%c", turtle->matrix[i][j]);
-        }
-        printf("\n");
-    }
+// TESTING FUNCTIONS
+
+void test(void){
+    test_initTurtle();
+    testCountAlpha();
+    testIsValid();
+    testGetAngle();
+    testGetColour();
+    testCheckColour();
 }
 
+void test_initTurtle(void){
+    FILE* op = fopen("test_file_for_testing.txt", "w");
+    Turtle* res = initTurtle(op);
+    assert(res->angle == INITIAL_ANGLE);
+    assert(res->colour == white);
+    assert(res->op == op);
+    assert(res->numcells == 0);
+    assert(res->row == RESHEIGHT/2);
+    assert(res->col == RESWIDTH/2);
+    assert(res->maxrow == RESHEIGHT);
+    assert(res->maxcol == RESWIDTH);
+    freeTurtle(res);
+}
 
+void testCountAlpha(void){
+    FILE* op = fopen("test_file_for_testing.txt", "w");
+    Turtle* res = initTurtle(op);
+    char str[15];
+    strcpy(str, "WR GY");
+    int c = countAlpha(str, res);
+    assert(c == 4);
+    freeTurtle(res);
+}
 
+void testIsValid(void){
+    assert(isValid(0, 0));
+    assert(!isValid(0, -1));
+    assert(!isValid(-5, 0));
+    assert(!isValid(-8, -3));
+    assert(!isValid(783, 4));
+    assert(isValid(4, 9));
+}
 
+void testGetAngle(void){
+    int angle = getAngle(0, 0, 1, 1);
+    assert(angle == 45);
+    angle = getAngle(0, 0, -1, -1);
+    assert(angle == 225);
+    angle = getAngle(0, 1, 1, 1);
+    assert(angle == 0);
+    angle = getAngle(1, 0, 2, 0);
+    assert(angle == 0);
+    angle = getAngle(0, 0, 0, -1);
+    assert(angle == 270);
+    angle = getAngle(0, 0, -1, 1);
+    assert(angle == 135);
+}
+
+void testGetColour(void){
+    char ch = 'G';
+    char str[10];
+    getColour(ch, str);
+    assert(strcmp(str, "GREEN") == 0);
+
+    ch = 'K';
+    getColour(ch, str);
+    assert(strcmp(str, "BLACK") == 0);
+    ch = 'B';
+    getColour(ch, str);
+    assert(strcmp(str, "BLUE") == 0);
+    ch = 'C';
+    getColour(ch, str);
+    assert(strcmp(str, "CYAN") == 0);
+}
+
+void testCheckColour(void){
+    FILE* op = fopen("test_file_for_tests.txt", "w");
+    Turtle* res = initTurtle(op);
+    res->matrix[0][0] = 'G';
+    res->matrix[1][1] = 'C';
+    checkColour(0, 0, 1, 1, res);
+    // assert(res->colour == cyan);
+    freeTurtle(res);
+}

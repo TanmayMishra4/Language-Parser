@@ -21,20 +21,22 @@ int main(int argc, char** argv){
         exit(EXIT_FAILURE);
     }
     bool is_valid = interp_file(input_file, res);
+    processFile(is_valid, argc, argv, res);
+}
+
+void processFile(bool is_valid, int argc, char** argv, Turtle* res){
     if(is_valid){
-        // Ouput File Case
         if(argc == 3){
             write_to_file(res, argv[2]);
             free_turtle(res);
         }
         else if(argc == 2){
-            // no output file case
             char x = getchar();
             x++;
             tc_exit_alt_screen();
             free_turtle(res);
         }
-        return 0;
+        exit(EXIT_SUCCESS);
     }
     else{
         if(res->filetype != NO_FILE && res->file){
@@ -42,7 +44,7 @@ int main(int argc, char** argv){
             res->file = NULL;
         }
         free_turtle(res);
-        return 1;
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -134,23 +136,19 @@ bool check_inslst(Program* prog, Turtle* res){
         prog->curword++;
         return true;
     }
-    else{
-        bool is_ins = check_ins(prog, res);
-        if(is_ins){
-            bool is_inslst = check_inslst(prog, res);
-            if(is_inslst){
-                return true;
-            }
-            else{
-                prog->curword = original_curword;
-                return false;
-            }
+    bool is_ins = check_ins(prog, res);
+    if(is_ins){
+        bool is_inslst = check_inslst(prog, res);
+        if(is_inslst){
+            return true;
         }
         else{
             prog->curword = original_curword;
             return false;
         }
     }
+    prog->curword = original_curword;
+    return false;
 }
 
 bool check_ins(Program* prog, Turtle* res){
@@ -379,7 +377,6 @@ bool check_var(Program* prog, VAR* var){
         if(is_ltr){
             char var_name = str_to_var(prog->words[curword]);
             int pos = var_name - 'A';
-            // check if variable has been set before
             if(prog->is_var_used[pos]){
                 var->vartype = prog->variables[pos].vartype;
                 var->numval = prog->variables[pos].numval;

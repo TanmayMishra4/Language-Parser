@@ -3,6 +3,7 @@
         "*.ejs": "html",
         "random": "c",
         "ratio": "c",
-        "neillsimplescreen.h": "c"
+        "neillsimplescreen.h": "c",
+        "extension.h": "c"
     }
 }
